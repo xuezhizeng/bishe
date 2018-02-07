@@ -3,6 +3,9 @@
 
 from wedfunctions import *
 from oracleoptions import *
+import time
+from multiprocessing import Pool
+import functools
 
 
 def gooddata(data):
@@ -21,12 +24,25 @@ def get_data(urls):
     return df
 
 
+def timer(func):
+    # 把原始函数的__name__等属性复制到wrapper()函数中,否则,有些依赖函数签名的代码执行就会出错.
+    @functools.wraps(func)
+    def wrapper(*args, **kw):
+        start = time.time()
+        func(*args, **kw)
+        end = time.time()
+        print('运行秒数：', str(end - start))
+
+    return wrapper
+
+
+@timer
 def index(job, city=''):
     # job = 'linux'
-    npage = 10
+    npage = 1
     # city = ['深圳', '广州']
     # 返回搜索结果列表的所有超链接
-    print('获取'+job+'的所有链接')
+    print('获取' + job + '的所有链接')
     urls = get_links_from(job, npage, city)
 
     # 首先搜索结果进行筛选一遍，因为有些置顶结果有不一样的链接
@@ -40,29 +56,12 @@ def index(job, city=''):
     # 写到Oracle数据库中
 
     print('保存到数据库')
+    job='test'
     save_to_oracle(df, database=job)
 
-# print('搜索Linux')
-# index('linux')
-# print()
-#
-#
-# print('搜索python')
-# index('python')
-# print()
 
-print('搜索java')
-index('java')
-print()
-
-print('***************************************************************************************')
-print('***************************************************************************************')
-print('***************************************************************************************')
-print('***************************************************************************************')
-print('***************************************************************************************')
-print('***************************************************************************************')
-print('***************************************************************************************')
-
-# print('搜索C#')
-# index('linux')
-# print()
+if __name__ == '__main__':
+    pool = Pool(processes=2)
+    pool.map_async(index, ['linux', 'python', '嵌入式'])
+    pool.close()
+    pool.join()
