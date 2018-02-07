@@ -1,0 +1,39 @@
+[2018-02-06 18:41:15,026][9184][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:41:40,174][8288][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:42:34,698][7460][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:43:09,197][3408][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:43:22,681][2964][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:44:00,493][9988][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:44:00,494][9988][log.py][line: 63][INFO] ## 17 18 19 
+[2018-02-06 18:44:40,780][10016][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:44:40,784][10016][log.py][line: 63][INFO] ## 17 18 19 20 21 22 23 24 
+[2018-02-06 18:49:45,242][10256][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:49:45,245][10256][log.py][line: 63][INFO] ## yi:13, er:14, san:15, si:16, wu:17, liu:18, 
+[2018-02-06 18:50:23,122][5676][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:50:23,124][5676][log.py][line: 63][INFO] ## yi:13, 
+er:14, 
+san:15, 
+si:16, 
+wu:17, 
+liu:18, 
+
+[2018-02-06 18:51:09,816][4904][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:51:09,819][4904][log.py][line: 63][INFO] ## 
+问题数据:
+yi:13, 
+er:14, 
+san:15, 
+si:16, 
+wu:17, 
+liu:18, 
+
+[2018-02-06 18:51:59,610][8316][log.py][line: 57][INFO] ## division by zero
+[2018-02-06 18:51:59,612][8316][log.py][line: 63][INFO] ## 
+问题数据:
+yi:7, 
+er:8, 
+san:9, 
+si:10, 
+wu:11, 
+liu:12, 
+

@@ -1,0 +1,3 @@
+[2018-02-07 14:20:37,637][3396][log.py][line: 43][INFO] ## 'gbk' codec can't encode character '\xa0' in position 180: illegal multibyte sequence
+[2018-02-07 14:20:37,775][3396][log.py][line: 43][INFO] ## 'gbk' codec can't encode character '\u200b' in position 174: illegal multibyte sequence
+[2018-02-07 14:20:38,048][3396][log.py][line: 43][INFO] ## 'gbk' codec can't encode character '\u200b' in position 180: illegal multibyte sequence
