@@ -27,7 +27,7 @@ def is_alphabet(uchar):
 
 def is_chinaesechar(uchar):
     """判断一个unicode是否是符号"""
-    c = [u'\u3001', u'\u3002', u'\u302a', u'\u302f',u'\u002c',u'\u002e',u'\uff0c']
+    c = [u'\u3001', u'\u3002', u'\u302a', u'\u302f', u'\u002c', u'\u002e', u'\uff0c', u'\u0020 ']
     if uchar in c:
         return True
     else:
