@@ -27,9 +27,6 @@ headers = [
 ]
 
 
-
-
-
 def get_content(url):
     '''
     获取url中的网页内容，最终返回HTML的树形结构，每个节点都是一个HTML对象
@@ -46,14 +43,16 @@ def get_content(url):
     except (urllib.error.HTTPError, TimeoutError) as e:
         print(e)
     # html = urllib.request.urlopen(req)  # 打开请求网页
-    contents = html.read()  # html.read()只能执行一次，再次执行返回结果为空，所以得先把结果保存下来
-    if isinstance(contents, bytes):  # 判断输出内容contents是否是字节格式
-        contents = contents.decode('utf-8')  # 转成字符串格式，这样才能显示中文啊
-    contents = BeautifulSoup(contents, "lxml")  # 设置解析器为“lxml”
-    return (contents)
+    else:
+        contents = html.read()  # html.read()只能执行一次，再次执行返回结果为空，所以得先把结果保存下来
+        if isinstance(contents, bytes):  # 判断输出内容contents是否是字节格式
+            contents = contents.decode('utf-8')  # 转成字符串格式，这样才能显示中文啊
+        contents = BeautifulSoup(contents, "lxml")  # 设置解析器为“lxml”
+        return (contents)
 
 
-def get_links_from(job, npage=1, city='全国'):
+def get_links_from(ur):
+    # def get_links_from(job, npage=1, city='全国'):
     '''
     搜索页面,返回搜索结果前npage页的职位超链接
     :param job: 工作名称
@@ -61,15 +60,24 @@ def get_links_from(job, npage=1, city='全国'):
     :param npage: 需要多少页的搜索结果
     :return: 所有列表的超链接，即子页网址
     '''
-    city_tmp = "jl={}".format('全国')
-    if isinstance(city, str) and city:
-        city_tmp+="%2B{}".format(city)
-    else:
-        for i in range(len(city)):
-            city_tmp += "%2B{}".format(str(city[i]))
-    urls=[]
+    # city_tmp = "jl={}".format('全国')
+    # if isinstance(city, str) and city:
+    #     city_tmp += "%2B{}".format(city)
+    # else:
+    #     for i in range(len(city)):
+    #         city_tmp += "%2B{}".format(str(city[i]))
+    urls = []
+    npage = 90  # 智联招聘最多就只显示90页
     for i in range(1, npage + 1):
-        url = "http://sou.zhaopin.com/jobs/searchresult.ashx?kw={}&p={}&".format(str(job), str(i)) + city_tmp
+        # 这里这个url是囊括了IT行业几乎所有的搜索页面
+        # url = 'https://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160400;160000;300100;160600&jl=全国&p={}&isadv=0'.format(
+        #     str(i))
+        # p='&p={}'.format(str(i))
+        url = ur + '&p=%s' % str(i)
+        print('get content: ' + url)
+        print(type(url))
+
+        # url = "http://sou.zhaopin.com/jobs/searchresult.ashx?kw={}&p={}&".format(str(job), str(i)) + city_tmp
         # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
         url = urllib.parse.quote(url, safe=string.printable)  # 进行URL编码，safe是不编码的字符集
         content = get_content(url)
@@ -88,7 +96,7 @@ def get_link_info(url):
     '''
 
     # 获取网页内容
-    # print("获取网页: " + str(url) + " 有用信息")
+    print("获取网页: " + str(url) + " 有用信息")
     content = get_content(url)
     # 校园招聘的HTML格式与其他不同，所以这里要分开选择
     if 'xiaoyuan' in url:
