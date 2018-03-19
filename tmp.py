@@ -1,7 +1,7 @@
 import cx_Oracle
 import pandas as pd
 import re
-from  oracleoptions import save_to_oracle
+from oracleoptions import save_to_oracle
 
 conn = cx_Oracle.connect("star/star@127.0.0.1/orcl")
 
@@ -28,18 +28,12 @@ def getCity(df):
     return df[df.是否失效 == '否']
 
 
-
 # print(df)
 
 
 # df = getCity(df)
 # 那下一次就直接从数据库里取zhaopin_city了
 # save_to_oracle(df, "zhaopin_city")
-
-
-
-
-
 
 
 # 统计工作地点信息
@@ -57,6 +51,7 @@ def jobNum(job):
         job += '[^+#]'
     p = re.compile(job, re.I)
     return len(list(filter(lambda s: re.search(p, s), df.工作名称)))
+
 
 jobs = ['java', 'c++', 'python', 'c#', 'c', 'linux', '大数据', 'web', '数据库']
 # 这里应该要把含有上面职位的招聘信息拳头提取出来形成一个子集，而不是光统计一个数字
@@ -79,7 +74,7 @@ def jobinfo(job):
         job += '[^+#]'
     p = re.compile(job, re.I)
     # 创建一盒空的
-    df_tmp=pd.DataFrame(columns=df.columns)
+    df_tmp = pd.DataFrame(columns=df.columns)
     # 忽略索引，往DataFrame中插入一行
     # df_tmp=df_tmp.append(df.loc[re.search(p,df.工作名称)], ignore_index=True)
     # 还是不理想，其余列都是NaN
@@ -87,4 +82,10 @@ def jobinfo(job):
     return tmp
 
 
-
+def process(x):
+    if "JAVA" in x.工作名称 or "Java" in x.工作名称 or "java" in x.工作名称:
+        return True
+    else:
+        return False
+# 利用apply方法，已经可以提取出特定招聘信息的条目了
+print(df[df.apply(process, axis=1)])
