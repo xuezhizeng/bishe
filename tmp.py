@@ -13,9 +13,9 @@ df = dp.DataOptions()
 # print(info)
 
 num = df.getJobInCity()
-print(num)
+# print(num)
 # sorted返回的是一个列表
-tmp = sorted(num.items(), key=lambda x: x[1])
+num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])
 
 plt.figure(figsize=(8, 5), dpi=80)
 # ax=plt.subplot(111)
@@ -28,6 +28,11 @@ time = i = datetime.datetime.now()
 
 plt.title(str(time.year) + '/' + str(time.month) + '/' + str(time.day) + '职位分布图')
 plt.bar(num.keys(), num.values(), label="职位数")
-plt.legend()    # 显示图例
 
+# 绘制文字，显示柱状图的值
+for x, y in zip(num.keys(), num.values()):
+    plt.text(x, y + 5, y, ha='center', va='bottom', fontsize=12)
+    # pass
+
+plt.legend()  # 显示图例
 plt.show()
