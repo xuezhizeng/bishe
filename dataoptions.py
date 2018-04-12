@@ -11,7 +11,12 @@ import re
 class DataOptions(object):
     def __init__(self):
         '''初始化就是从数据库里读取数据'''
-        conn = cx_Oracle.connect("star/star@127.0.0.1/orcl")
+        try:
+            conn = cx_Oracle.connect("star/star@127.0.0.1/orcl")
+        except(cx_Oracle.DatabaseError, cx_Oracle.OperationalError) as e:
+            print("读取数据库失败")
+            print(e)
+            exit(-1)
         sql = 'select * from zhaopin_city'
 
         # Index(['网址', '工作名称', '公司名称', '公司网址', '福利', '月工资', '发布日期', '经验', '人数', '工作地点',
