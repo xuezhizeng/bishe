@@ -5,6 +5,7 @@ from wedfunctions import *
 from oracleoptions import *
 import time
 from multiprocessing import Pool
+import pandas as pd
 import functools
 
 

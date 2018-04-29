@@ -1,5 +1,7 @@
 # !/usr/bin/env python
 # coding:utf-8
+# 绘图模块：draw.py
+# 封装成pictures类
 import tkinter as tk
 import dataoptions as dp
 import datetime

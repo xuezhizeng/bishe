@@ -106,5 +106,21 @@ class DataOptions(object):
         # 利用apply方法，已经可以提取出特定招聘信息的条目了
         return self.df[self.df.apply(process, axis=1, args=([job]))]
 
+    def format(self):
+        '''
+        将数据规范化
+        :return:
+        '''
+        pass
+
+    def jobRequest(self):
+        '''
+        统计职职位要求
+        :return:
+        '''
+        pass
+
+
+
 # df=getData()
 # print(getJobInfo(df,'c#'))

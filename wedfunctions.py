@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
+# 爬虫模块 internetworm.py
+# 封装成worm类
 import random
 import urllib
 import string
 from bs4 import BeautifulSoup
 import formatstaing
-import sys, io
+import sys
+import io
 
 # 用来配置请求包的头，否则有些服务器会拒绝请求
 headers = [
@@ -79,7 +82,8 @@ def get_links_from(ur):
 
         # url = "http://sou.zhaopin.com/jobs/searchresult.ashx?kw={}&p={}&".format(str(job), str(i)) + city_tmp
         # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
-        url = urllib.parse.quote(url, safe=string.printable)  # 进行URL编码，safe是不编码的字符集
+        # 进行URL编码，safe是不编码的字符集
+        url = urllib.parse.quote(url, safe=string.printable)
         content = get_content(url)
         link_urls = content.select('td.zwmc a')  # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
         for url in link_urls:
@@ -87,7 +91,6 @@ def get_links_from(ur):
     return (urls)  # 前npage页的职位链接都在这里了
 
 
-# 这个函数不适合校园招聘
 def get_link_info(url):
     '''
     获取此网站的有用信息并保存成字典形式
@@ -110,7 +113,8 @@ def get_link_info(url):
         com_scale = content.select('div.cJobDetailInforWrap li')[5]  # 公司规模
         com_nature = content.select('div.cJobDetailInforWrap li')[7]  # 公司性质
         com_eatcatee = content.select('div.cJobDetailInforWrap li')[3]  # 公司行业
-        discribe = content.select('div.cJobDetail_tabSwitch  div.cJobDetail_tabSwitch_content p')[0]  # 加注职位描述
+        discribe = content.select(
+            'div.cJobDetail_tabSwitch  div.cJobDetail_tabSwitch_content p')[0]  # 加注职位描述
         # 实习生没有这三项
         welfare = None,
         pay = None,
@@ -130,10 +134,14 @@ def get_link_info(url):
         job_nature = content.select('div.terminalpage-left strong')[3]  # 工作性质
         educate = content.select('div.terminalpage-left strong')[5]  # 最低学历
         cate = content.select('div.terminalpage-left strong')[7]  # 职位类别
-        com_scale = content.select('ul.terminal-ul.clearfix li strong')[8]  # 公司规模
-        com_nature = content.select('ul.terminal-ul.clearfix li strong')[9]  # 公司性质
-        com_eatcatee = content.select('ul.terminal-ul.clearfix li strong')[10]  # 公司行业
-        discribe = content.select('div.terminalpage-main div.tab-inner-cont')[0]  # 职位描述
+        com_scale = content.select(
+            'ul.terminal-ul.clearfix li strong')[8]  # 公司规模
+        com_nature = content.select(
+            'ul.terminal-ul.clearfix li strong')[9]  # 公司性质
+        com_eatcatee = content.select(
+            'ul.terminal-ul.clearfix li strong')[10]  # 公司行业
+        discribe = content.select(
+            'div.terminalpage-main div.tab-inner-cont')[0]  # 职位描述
         # 为了保持data赋值一致
         welfare = welfare.text.strip()
         pay = pay.text.strip()
@@ -176,3 +184,17 @@ def get_link_info(url):
         "是否失效": outmoded,
     }
     return (data)
+def get_data(urls):
+    '''
+    调用get_link_info()函数爬取所有数据，保存到数据库
+    :return: 不返回，值保存到数据库，需要自己到数据库取
+    '''
+    columns = ["网址", "工作名称", "公司名称", "公司网址", "福利", "月工资", "发布日期", "经验", "人数", "工作地点", "工作性质", "最低学历", "职位类别", "公司规模",
+               "公司性质", "公司行业", "职位描述", "是否失效"]
+    # df = pd.DataFrame(data=[], columns=columns)
+    links = []
+    for url in urls:
+        print('获取职位具体信息, 网址: ' + url)
+        data = get_link_info(url)
+        # df = df.append(data, ignore_index=True)
+    # return df
