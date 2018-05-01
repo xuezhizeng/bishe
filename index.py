@@ -72,6 +72,8 @@ def index(url):
 #     pool.close()
 #     pool.join()
 
-urls = ['http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
-        'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
-index(url=urls[1])
+def main():
+
+    urls = ['http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
+            'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
+    return index(url=urls[1])

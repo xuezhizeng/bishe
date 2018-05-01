@@ -14,6 +14,16 @@ import pylab
 pylab.mpl.rcParams['font.sans-serif'] = ['SimHei']
 
 
+class draw(object):
+    """绘图模块，专注画图"""
+
+    def __init__(self, ):
+        super(draw, self).__init__()
+
+    def jobsInCitys(slef):
+        pass
+
+
 def drawPic():
     try:
         sampleCount = int(inputEntry.get())
@@ -32,9 +42,10 @@ def drawPic():
     figure.clf()
     fig = figure.add_subplot(111)
 
-    time =  datetime.datetime.now()
+    time = datetime.datetime.now()
 
-    fig.set_title(str(time.year) + '/' + str(time.month) + '/' + str(time.day) + '职位分布图')
+    fig.set_title(str(time.year) + '/' + str(time.month) +
+                  '/' + str(time.day) + '职位分布图')
     fig.bar(num.keys(), num.values(), label="职位数")
 
     # 绘制文字，显示柱状图的值
@@ -58,7 +69,8 @@ if __name__ == '__main__':
     inputEntry = tk.Entry(root)
     inputEntry.grid(row=1, column=1)
     inputEntry.insert(0, '50')
-    tk.Button(root, text='画图', command=drawPic).grid(row=1, column=2, columnspan=3)
+    tk.Button(root, text='画图', command=drawPic).grid(
+        row=1, column=2, columnspan=3)
 
     # 启动事件循环
     root.mainloop()

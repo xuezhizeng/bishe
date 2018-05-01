@@ -7,32 +7,37 @@ import urllib
 import string
 from bs4 import BeautifulSoup
 import formatstaing
+import pandas as pd
 import sys
 import io
 
-# 用来配置请求包的头，否则有些服务器会拒绝请求
-headers = [
-    "Mozilla/5.0 (Windows NT 6.1; Win64; rv:27.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:27.0) Gecko/20100101 Firfox/27.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:10.0) Gecko/20100101 Firfox/10.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/21.0.1180.110 Safari/537.36",
-    "Mozilla/5.0 (X11; Ubuntu; Linux i686 rv:10.0) Gecko/20100101 Firfox/27.0",
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/34.0.1838.2 Safari/537.36",
-    "Mozilla/5.0 (X11; Ubuntu; Linux i686 rv:27.0) Gecko/20100101 Firfox/27.0",
-    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-    "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 ",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
-    "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0",
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11"
-]
-
 
 class worm(object):
+
     def __init__(self):
-        pass
+        # 用来配置请求包的头，否则有些服务器会拒绝请求
+        self.headers = [
+            "Mozilla/5.0 (Windows NT 6.1; Win64; rv:27.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:27.0) Gecko/20100101 Firfox/27.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:10.0) Gecko/20100101 Firfox/10.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/21.0.1180.110 Safari/537.36",
+            "Mozilla/5.0 (X11; Ubuntu; Linux i686 rv:10.0) Gecko/20100101 Firfox/27.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/34.0.1838.2 Safari/537.36",
+            "Mozilla/5.0 (X11; Ubuntu; Linux i686 rv:27.0) Gecko/20100101 Firfox/27.0",
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+            "Mozilla/5.0 (Windows; U; MSIE 9.0; Windows NT 9.0; en-US)",
+            "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN) AppleWebKit/523.15 (KHTML, like Gecko, Safari/419.3) Arora/0.3 ",
+            "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1",
+            "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11"
+        ]
+
+        self.urls = 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0'
+
+        # self.urls = ['http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
+        # 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
 
     def get_content(self, url):
         '''
@@ -40,10 +45,11 @@ class worm(object):
         :param url: 需要获取内容的网页链接
         :return: 经lxml解析后的网页内容
         '''
-        random_header = random.choice(headers)
+        random_header = random.choice(self.headers)
         req = urllib.request.Request(url)
         # random_header="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0"
-        req.add_header("User-Agent", random_header)  # 需要随机设定用户代理以隐藏身份,否则有些服务器会拒绝请求
+        # 需要随机设定用户代理以隐藏身份,否则有些服务器会拒绝请求
+        req.add_header("User-Agent", random_header)
         req.add_header("Get", url)  # 所请求页面
         try:
             html = urllib.request.urlopen(req)  # 打开请求网页
@@ -56,8 +62,7 @@ class worm(object):
             contents = BeautifulSoup(contents, "lxml")  # 设置解析器为“lxml”
             return (contents)
 
-
-    def get_links_from(self, url):
+    def get_links_from(self):
         # def get_links_from(job, npage=1, city='全国'):
         '''
         搜索页面,返回搜索结果前npage页的职位超链接
@@ -79,7 +84,7 @@ class worm(object):
             # url = 'https://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160400;160000;300100;160600&jl=全国&p={}&isadv=0'.format(
             #     str(i))
             # p='&p={}'.format(str(i))
-            url = url + '&p=%s' % str(i)
+            url = self.url + '&p=%s' % str(i)
             print('get content: ' + url)
             # print(type(url))
 
@@ -88,11 +93,11 @@ class worm(object):
             # 进行URL编码，safe是不编码的字符集
             url = urllib.parse.quote(url, safe=string.printable)
             content = get_content(url)
-            link_urls = content.select('td.zwmc a')  # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
+            # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
+            link_urls = content.select('td.zwmc a')
             for url in link_urls:
                 urls.append(url.get('href'))
         return (urls)  # 前npage页的职位链接都在这里了
-
 
     def get_link_info(self, url):
         '''
@@ -108,14 +113,17 @@ class worm(object):
         if 'xiaoyuan' in url:
             job = content.select('div.cJobDetailInforWrap h1')[0]  # 工作名称
             company = content.select('div.cJobDetailInforWrap li')[1]  # 公司名称
-            company_url = content.select('div.cJobDetailInforWrap li a')[0]  # 公司网址
+            company_url = content.select(
+                'div.cJobDetailInforWrap li a')[0]  # 公司网址
             date = content.select('div.cJobDetailInforWrap li')[15]  # 发布日期
             num = content.select('div.cJobDetailInforWrap li')[13]  # 人数
             area = content.select('div.cJobDetailInforWrap li')[9]  # 工作地点
             cate = content.select('div.cJobDetailInforWrap li')[11]  # 职位类别
             com_scale = content.select('div.cJobDetailInforWrap li')[5]  # 公司规模
-            com_nature = content.select('div.cJobDetailInforWrap li')[7]  # 公司性质
-            com_eatcatee = content.select('div.cJobDetailInforWrap li')[3]  # 公司行业
+            com_nature = content.select(
+                'div.cJobDetailInforWrap li')[7]  # 公司性质
+            com_eatcatee = content.select(
+                'div.cJobDetailInforWrap li')[3]  # 公司行业
             discribe = content.select(
                 'div.cJobDetail_tabSwitch  div.cJobDetail_tabSwitch_content p')[0]  # 加注职位描述
             # 实习生没有这三项
@@ -134,7 +142,8 @@ class worm(object):
             exper = content.select('div.terminalpage-left strong')[4]  # 经验
             num = content.select('div.terminalpage-left strong')[6]  # 人数
             area = content.select('div.terminalpage-left strong')[1]  # 工作地点
-            job_nature = content.select('div.terminalpage-left strong')[3]  # 工作性质
+            job_nature = content.select(
+                'div.terminalpage-left strong')[3]  # 工作性质
             educate = content.select('div.terminalpage-left strong')[5]  # 最低学历
             cate = content.select('div.terminalpage-left strong')[7]  # 职位类别
             com_scale = content.select(
@@ -187,17 +196,21 @@ class worm(object):
             "是否失效": outmoded,
         }
         return (data)
-    def get_data(self, urls):
+
+    def get_data(self):
         '''
         调用get_link_info()函数爬取所有数据，保存到数据库
         :return: 不返回，值保存到数据库，需要自己到数据库取
         '''
-        columns = ["网址", "工作名称", "公司名称", "公司网址", "福利", "月工资", "发布日期", "经验", "人数", "工作地点", "工作性质", "最低学历", "职位类别", "公司规模",
+        columns = ["网址", "工作名称", "公司名称", "公司网址", "福利", "月工资", "发布日期", "经验", "人数", "工作地点", "工作性质", "最低学历", "职位类别",
+                   "公司规模",
                    "公司性质", "公司行业", "职位描述", "是否失效"]
-        # df = pd.DataFrame(data=[], columns=columns)
-        links = []
-        for url in urls:
+        df = pd.DataFrame(data=[], columns=columns)
+        # links = []
+        links = get_links_from()
+        for url in links:
             print('获取职位具体信息, 网址: ' + url)
             data = get_link_info(url)
-            # df = df.append(data, ignore_index=True)
-        # return df
+            df = df.append(data, ignore_index=True)
+            print(data)
+        return df

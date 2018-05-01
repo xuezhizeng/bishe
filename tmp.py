@@ -31,27 +31,27 @@ class draw(object):
 
 
 def picture1():
-    # df = dp.DataOptions()
-    # num = df.getJobInCity()
-    # # sorted返回的是一个列表
-    # num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])
-    #
-    # # 清空图像，以使得前后两次绘制的图像不会重叠
-    # figure1.clf()
-    # fig = figure1.add_subplot(111)
-    # time = datetime.datetime.now()
-    # fig.set_title(str(time.year) + '/' + str(time.month) +
-    #               '/' + str(time.day) + '职位分布图')
-    # fig.bar(num.keys(), num.values(), label="职位数")
-    # # 绘制文字，显示柱状图的值
-    # for x, y in zip(num.keys(), num.values()):
-    #     fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=12)
-    # canvas1.show()
+    df = dp.DataOptions()
+    num = df.getJobInCity()
+    # sorted返回的是一个列表
+    num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])
 
+    # 清空图像，以使得前后两次绘制的图像不会重叠
+    figure1.clf()
     fig = figure1.add_subplot(111)
-    fig.set_title('picture1')
-    fig.plot([1, 2, 3, 4, 5, 6], [1, 4, 9, 16, 25, 36])
+    time = datetime.datetime.now()
+    fig.set_title(str(time.year) + '/' + str(time.month) +
+                  '/' + str(time.day) + '职位分布图')
+    fig.bar(num.keys(), num.values(), label="职位数")
+    # 绘制文字，显示柱状图的值
+    for x, y in zip(num.keys(), num.values()):
+        fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=12)
     canvas1.show()
+
+    # fig = figure1.add_subplot(111)
+    # fig.set_title('picture1')
+    # fig.plot([1, 2, 3, 4, 5, 6], [1, 4, 9, 16, 25, 36])
+    # canvas1.show()
 
 
 def picture2():
@@ -66,12 +66,13 @@ def picture3():
     # figure3.clf()
     fig = figure3.add_subplot(111)
     fig.set_title('picture3')
-    fig.plot([1, 2, 3, 4, 5, 6], [6,5,4,3,2,1])
+    fig.plot([1, 2, 3, 4, 5, 6], [6, 5, 4, 3, 2, 1])
     canvas3.show()
 
 
 # 由于tkinter中没有ToolTip功能，所以自定义这个功能如下
 class ToolTip(object):
+
     def __init__(self, widget):
         self.widget = widget
         self.tipwindow = None
@@ -133,8 +134,8 @@ if __name__ == '__main__':
     # Adding a Combobox
     city = tk.StringVar()
     cityChosen = ttk.Combobox(root, width=12, textvariable=city)
-    # cityChosen['values'] = ('java', 'c++', 'python', 'c#', 'c', 'linux', '大数据', 'web', '数据库')
-    cityChosen['values'] = ('北京', '上海', '广州', '深圳', '南京', '成都', '杭州', '武汉', '西安', '郑州')
+    cityChosen['values'] = ('北京', '上海', '广州', '深圳', '南京',
+                            '成都', '杭州', '武汉', '西安', '郑州')
     cityChosen.grid(row=0, rowspan=3, column=0, columnspan=2, sticky='W')
     cityChosen.current(2)  # 设置初始显示值，值为元组['values']的下标
     cityChosen.config(state='readonly')  # 设为只读模式
@@ -143,7 +144,8 @@ if __name__ == '__main__':
     # Adding a Combobox
     job = tk.StringVar()
     jobChosen = ttk.Combobox(root, width=12, textvariable=job)
-    jobChosen['values'] = ('java', 'c++', 'python', 'c#', 'c', 'linux', '大数据', 'web', '数据库')
+    jobChosen['values'] = ('java', 'c++', 'python', 'c#',
+                           'c', 'linux', '大数据', 'web', '数据库')
     # cityChosen['values'] = ('北京', '上海', '广州', '深圳', '南京', '成都', '杭州', '武汉', '西安', '郑州')
     jobChosen.grid(row=0, rowspan=3, column=3, columnspan=2, sticky='W')
     jobChosen.current(2)  # 设置初始显示值，值为元组['values']的下标
@@ -156,7 +158,6 @@ if __name__ == '__main__':
     action.grid(row=0, rowspan=3, column=8, columnspan=2)  # , ipady=7)
 
     # 在Tk的GUI上放置一个画布，并用.grid()来调整布局
-    # figure1 = Figure(figsize=(4, 6), dpi=100, facecolor='red', edgecolor='green')
     figure1 = Figure(figsize=(4, 6), dpi=100)
     canvas1 = FigureCanvasTkAgg(figure1, master=root)
     canvas1.show()
