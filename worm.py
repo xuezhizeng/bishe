@@ -92,7 +92,7 @@ class worm(object):
             # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
             # 进行URL编码，safe是不编码的字符集
             url = urllib.parse.quote(url, safe=string.printable)
-            content = get_content(url)
+            content = self.get_content(url)
             # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
             link_urls = content.select('td.zwmc a')
             for url in link_urls:
@@ -108,7 +108,7 @@ class worm(object):
 
         # 获取网页内容
         print("获取网页: " + str(url) + " 有用信息")
-        content = get_content(url)
+        content = self.get_content(url)
         # 校园招聘的HTML格式与其他不同，所以这里要分开选择
         if 'xiaoyuan' in url:
             job = content.select('div.cJobDetailInforWrap h1')[0]  # 工作名称
@@ -207,10 +207,10 @@ class worm(object):
                    "公司性质", "公司行业", "职位描述", "是否失效"]
         df = pd.DataFrame(data=[], columns=columns)
         # links = []
-        links = get_links_from()
+        links = self.get_links_from()
         for url in links:
             print('获取职位具体信息, 网址: ' + url)
-            data = get_link_info(url)
+            data = self.get_link_info(url)
             df = df.append(data, ignore_index=True)
             print(data)
         return df

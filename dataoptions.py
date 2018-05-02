@@ -62,7 +62,7 @@ class DataOptions(object):
                     n2 = re.sub(r'^\S*-', '', self.df.iloc[i, 13])
                     n2 = re.sub(r'人', '', n2)
                     self.df.iloc[i, 13] = (int(n1) + int(n2)) / 2
-                except ValueError as e:
+                except ValueError:
                     self.df.iloc[i, 13] = 0
                     continue
             else:
@@ -86,7 +86,7 @@ class DataOptions(object):
 
     def getAllJobNum(self):
         '''找出各职位的招聘信息
-            这个方法已经过时了，应该用下面的新的getJobsInfo'''
+            这个方法已经过时了，应该用下面的新的cityOfJob'''
 
         def jobNum(df, job):
             # re.I: 正则忽略大小写
@@ -122,7 +122,7 @@ class DataOptions(object):
         # 还是不理想，其余列都是NaN
         return self.df.loc[filter(lambda s: re.search(p, s), self.df.工作名称)]
 
-    def getJobsInfo_v0(self, job):
+    def cityOfJob_v0(self, job):
         '''找出某职位的具体招聘信息
             返回的是df的一个子集'''
 
@@ -142,15 +142,16 @@ class DataOptions(object):
         else:
             return False
 
-    def getJobsInfo(self, job):
+    def cityOfJob(self, job):
         '''找出某职位的城市分布信息
             返回字典{city: num}'''
         jobinfo = self.df[self.df.apply(
             self.process, axis=1, args=([job]))]  # 是df的子集
         data = dict(collections.Counter(list(jobinfo.工作地点)))
-        return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12]) # 返回字典{city: num}
+        # 返回字典{city: num}
+        return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
 
-    def getCityInfo(self, city):
+    def jobsInCity(self, city):
         '''确定一个城市的职位统计
         :return:{job, num}'''
         data = self.df[self.df.工作地点 == city]
@@ -164,12 +165,13 @@ class DataOptions(object):
 
     def compress(self, value1, value2, flag):
         if flag == 0:  # 某个职位的城市分布信息
-            d1 = self.getJobsInfo(value1)  # value1的具体招聘信息，是字典{city: num}
-            d2 = self.getJobsInfo(value2)  # value2的具体招聘信息，是字典{city: num}
+            d1 = self.cityOfJob(value1)  # value1的具体招聘信息，是字典{city: num}
+            d2 = self.cityOfJob(value2)  # value2的具体招聘信息，是字典{city: num}
         else:  # 某个城市的职位信息统计
-            d1 = self.getCityInfo(value1)  # value1的具体招聘信息，是字典{job: num}
-            d2 = self.getCityInfo(value2)  # value2的具体招聘信息，是字典{job: num}
-        data1 = dict(sorted(d1.items(), key=lambda x: x[1], reverse=True)[:12])  # 获取前12名
+            d1 = self.jobsInCity(value1)  # value1的具体招聘信息，是字典{job: num}
+            d2 = self.jobsInCity(value2)  # value2的具体招聘信息，是字典{job: num}
+        data1 = dict(sorted(d1.items(), key=lambda x: x[
+                     1], reverse=True)[:12])  # 获取前12名
         data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:12])
         # print(d1,'\n',d2,'\n',data1,'\n',data2)
         l2 = list(data2.keys())
@@ -186,7 +188,7 @@ class DataOptions(object):
         统计职职位要求
         :return:
         '''
-        jobNums = getAllJobNum()
+        jobNums = self.getAllJobNum()
         count = reduce(lambda x, y: x + y, jobNums.values())
         return jobNums[job] / count
 
@@ -196,8 +198,9 @@ class DataOptions(object):
 if __name__ == '__main__':
     d = DataOptions()
     # d.compress('java', 'c++')
-    d.getCityInfo('北京')
-# t=d.getJobsInfo('java')
+    d.jobsInCity('北京')
+    print(d.getJobInCity())
+# t=d.cityOfJob('java')
 # print(t)
 # return t
 
