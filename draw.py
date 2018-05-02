@@ -30,10 +30,10 @@ class draw(object):
         self.root = tk.Tk()
         self.root.title('基于Python技术的基础数据可视化应用')
         # self.root.setvar()
-        # 设置窗口的大小宽x高+偏移量
-        self.root.geometry('802x630+100+30')
         # 设置窗口图标
         self.root.iconbitmap(r'e:\15970\Pictures\123.ico')
+        # 设置窗口的大小宽x高+偏移量
+        self.root.geometry('1000x630+100+30')
         self.root.resizable(0, 0)
 
         self.createCombobox()
@@ -44,6 +44,8 @@ class draw(object):
         self.picture2()
         self.picture3()
 
+    # def func(self):
+
     def createCombobox(self):
         # Adding a Combobox
         print('init：创建cityChosen')
@@ -52,7 +54,7 @@ class draw(object):
             self.root, width=12, textvariable=self.city)
         self.cityChosen['values'] = ('北京', '上海', '广州', '深圳', '南京',
                                      '成都', '杭州', '武汉', '西安', '郑州')
-        self.cityChosen.grid(row=0, rowspan=3, column=1,
+        self.cityChosen.grid(row=0, column=1,
                              columnspan=2, sticky='W')
         self.cityChosen.current(2)  # 设置初始显示值，值为元组['values']的下标
         self.cityChosen.config(state='readonly')  # 设为只读模式
@@ -65,7 +67,7 @@ class draw(object):
             self.root, width=12, textvariable=self.job)
         self.jobChosen['values'] = ('Java', 'C/C++', 'Python', 'C#', '区块链',
                                     'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
-        self.jobChosen.grid(row=0, rowspan=3, column=3,
+        self.jobChosen.grid(row=0, column=3,
                             columnspan=2, sticky='W')
         self.jobChosen.current(2)  # 设置初始显示值，值为元组['values']的下标
         self.jobChosen.config(state='readonly')  # 设为只读模式
@@ -76,35 +78,81 @@ class draw(object):
         print('init：创建action1')
         self.action1 = ttk.Button(
             self.root, text="重画", width=10, command=self.reDraw)
-        self.action1.grid(row=0, rowspan=3, column=6,
+        self.action1.grid(row=0, column=6,
                           columnspan=2)  # , ipady=7)
 
         # Adding a Button
         print('init：创建action2')
         self.action2 = ttk.Button(
             self.root, text="后台更新数据", width=12, command=self.updata)
-        self.action2.grid(row=0, rowspan=3, column=11,
+        self.action2.grid(row=0, column=11,
                           columnspan=2)  # , ipady=7)
 
     def creatCanvas(self):
-        # 在Tk的GUI上放置一个画布，并用.grid()来调整布局
-        # self.figure1 = Figure(figsize=(4, 6), dpi=100, facecolor='red')
+
+        # self.labelsFrame = ttk.LabelFrame(self.root, text=' 嵌套区域 ',width=6,height=2)
+        # # self.labelsFrame
+        # self.labelsFrame.grid(row=1, column=0, columnspan=9)
+        self.canvas0 = tk.Canvas(self.root, width=600, height=200,
+                           # 内边框大小
+                           highlightthickness=3, bg='#FFFF00')
+        self.canvas0.grid(row=1, column=0, columnspan=9)
+        # self.canvas0.show()
+
         print('init：创建canvas1')
-        self.figure1 = Figure(figsize=(4, 6), dpi=100)
+        self.figure1 = Figure(figsize=(6, 4), dpi=100)
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self.root)
-        self.canvas1.get_tk_widget().grid(row=3, rowspan=22, column=0, columnspan=9)
+        self.canvas1.get_tk_widget().grid(row=2, rowspan=4, column=0, columnspan=9)
         self.canvas1.show()
 
         print('init：创建canvas2')
         self.figure2 = Figure(figsize=(4, 3), dpi=100)
         self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self.root)
-        self.canvas2.get_tk_widget().grid(row=3, rowspan=11, column=9, columnspan=5)
+        self.canvas2.get_tk_widget().grid(row=1, rowspan=2, column=9, columnspan=5)
         self.canvas2.show()
 
         print('init：创建canvas3')
         self.figure3 = Figure(figsize=(4, 3), dpi=100)
         self.canvas3 = FigureCanvasTkAgg(self.figure3, master=self.root)
-        self.canvas3.get_tk_widget().grid(row=14, rowspan=11, column=9, columnspan=5)
+        self.canvas3.get_tk_widget().grid(row=3, rowspan=2, column=9, columnspan=5)
+        self.canvas3.show()
+
+
+
+    def creatCanvas_v0(self):
+        # 在Tk的GUI上放置一个画布，并用.grid()来调整布局
+        # self.figure1 = Figure(figsize=(4, 6), dpi=100, facecolor='red')
+        # print('init: 创建文本框')
+        # self.scr = scrolledtext.ScrolledText(
+        #     self.root, width=6, height=4, wrap=tk.WORD)
+        # self.scr.grid(row=1, rowspan=6, column=0, columnspan=9, sticky='WE')
+
+        # self.labelsFrame = ttk.LabelFrame(self.root, text=' 嵌套区域 ',width=6,height=2)
+        # # self.labelsFrame
+        # self.labelsFrame.grid(row=1, rowspan=6, column=8, columnspan=9)
+
+        print('init：创建canvas0')
+        self.figure0 = Figure(figsize=(6, 4), dpi=100)
+        self.canvas0 = FigureCanvasTkAgg(self.figure0, master=self.root)
+        self.canvas0.get_tk_widget().grid(row=1, rowspan=6, column=0, columnspan=9)
+        self.canvas0.show()
+
+        print('init：创建canvas1')
+        self.figure1 = Figure(figsize=(6, 4), dpi=100)
+        self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self.root)
+        self.canvas1.get_tk_widget().grid(row=7, rowspan=16, column=0, columnspan=9)
+        self.canvas1.show()
+
+        print('init：创建canvas2')
+        self.figure2 = Figure(figsize=(4, 3), dpi=100)
+        self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self.root)
+        self.canvas2.get_tk_widget().grid(row=1, rowspan=11, column=9, columnspan=5)
+        self.canvas2.show()
+
+        print('init：创建canvas3')
+        self.figure3 = Figure(figsize=(4, 3), dpi=100)
+        self.canvas3 = FigureCanvasTkAgg(self.figure3, master=self.root)
+        self.canvas3.get_tk_widget().grid(row=12, rowspan=11, column=9, columnspan=5)
         self.canvas3.show()
 
     def updata(self):
@@ -122,10 +170,13 @@ class draw(object):
     def picture2(self):
         # self.countByCity('北京')
         self.jobsCountInCity_pie('深圳')
+        # pass
 
     def picture3(self):
         # self.countByJob('java')
         self.cityCountOfjob_pie('java')
+        # pass
+
     def compare(self, value1, value2, flag):
         '''对两个字典进行比较，比如：
             job1和job2的城市分布前12名
@@ -167,7 +218,8 @@ class draw(object):
         '''统计每个城市的所有职位数，不分行业'''
         print('countAllJobs')
         num = self.df.getJobInCity()
-        num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])  # {city: num}
+        num = dict(sorted(num.items(), key=lambda x: x[
+                   1], reverse=True)[:10])  # {city: num}
 
         # 清空图像，以使得前后两次绘制的图像不会重叠
         self.figure1.clf()
@@ -208,43 +260,34 @@ class draw(object):
             fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=8)
         self.canvas2.show()
 
-    def cityCountOfjob_pie(self,job):
-        data = self.df.cityOfJob(job)
-        data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:6])
-        Z = np.ones(len(data))
+    def cityCountOfjob_pie(self, job):
+        '''某种职业的城市分布饼图'''
+        data0 = self.df.cityOfJob(job)
+        data = dict(
+            sorted(data0.items(), key=lambda x: x[1], reverse=True)[:6])
+        data['其他'] = sum(data0.values()) - sum(data.values())
         self.figure3.clf()
         fig = self.figure3.add_subplot(111)
         fig.set_title('职位城市分布图')
-        fig.pie(data.values())#, explode=Z * .05)
+        fig.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
         fig.set_aspect('equal')
         fig.set_xticks([])
         fig.set_yticks([])
         self.canvas3.show()
+
     def jobsCountInCity_pie(self, city):
         '''某座城市的职位分布饼图'''
-        data = self.df.jobsInCity(city)  # 字典{job: num}
-        data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:6])
-        # print(data)
-        Z = np.ones(len(data))
-        # Z[-1] *= 2
-        s = sum(data.values())
-
+        data0 = self.df.jobsInCity(city)  # 字典{job: num}
+        data = dict(
+            sorted(data0.items(), key=lambda x: x[1], reverse=True)[:6])
+        data['其他'] = sum(data0.values()) - sum(data.values())
         self.figure2.clf()
         fig = self.figure2.add_subplot(111)
         fig.set_title('城市职位数分布图')
-        # fig.axes(0, 0, 0.8, 0.8)
-        # fig.pie(Z, explode=Z * .05, colors=['%f' % (i / s) for i in data.values()],
-        #         wedgeprops={"linewidth": 1, "edgecolor": "black"})
-        # fig.pie(Z, explode=Z * .03, colors=['%f' % (np.arctan2(i + 1, s + 1)) for i in data.values()])
-        # fig.pie(Z, explode=Z * .05, colors=['%f' % (((i+1) / s)) for i in data.values()])
-        fig.pie(data.values())#, explode=Z * .05)
-        # def f(x, y):
-        #     return (1 - x / 2 + x ** 5 + y ** 3) * np.exp(-x ** 2 - y ** 2)
-        # fig.pie(Z, explode=Z * .03, colors=['%f' % (100 * f(i,s)) for i in data.values()])
+        fig.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
         fig.set_aspect('equal')
         fig.set_xticks([])
         fig.set_yticks([])
-
         self.canvas2.show()
 
     def reDraw(self):
