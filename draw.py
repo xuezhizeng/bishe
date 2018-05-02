@@ -28,8 +28,23 @@ class draw(object):
         super(draw, self).__init__()
         self.df = dp.DataOptions()
         self.root = tk.Tk()
-        # self.root.size(12,8)
+        self.root.title('基于Python技术的基础数据可视化应用')
+        # self.root.setvar()
+        # 设置窗口的大小宽x高+偏移量
+        self.root.geometry('802x630+100+30')
+        # 设置窗口图标
+        self.root.iconbitmap(r'e:\15970\Pictures\123.ico')
+        self.root.resizable(0, 0)
 
+        self.createCombobox()
+        self.createButton()
+        self.creatCanvas()
+
+        self.picture1()
+        self.picture2()
+        self.picture3()
+
+    def createCombobox(self):
         # Adding a Combobox
         print('init：创建cityChosen')
         self.city = tk.StringVar()
@@ -56,6 +71,7 @@ class draw(object):
         self.jobChosen.config(state='readonly')  # 设为只读模式
         createToolTip(self.jobChosen, '选择技术.')
 
+    def createButton(self):
         # Adding a Button
         print('init：创建action1')
         self.action1 = ttk.Button(
@@ -70,28 +86,26 @@ class draw(object):
         self.action2.grid(row=0, rowspan=3, column=11,
                           columnspan=2)  # , ipady=7)
 
+    def creatCanvas(self):
         # 在Tk的GUI上放置一个画布，并用.grid()来调整布局
         # self.figure1 = Figure(figsize=(4, 6), dpi=100, facecolor='red')
         print('init：创建canvas1')
         self.figure1 = Figure(figsize=(4, 6), dpi=100)
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self.root)
         self.canvas1.get_tk_widget().grid(row=3, rowspan=22, column=0, columnspan=9)
-        # self.canvas1.show()
-        self.picture1()
+        self.canvas1.show()
 
         print('init：创建canvas2')
         self.figure2 = Figure(figsize=(4, 3), dpi=100)
         self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self.root)
         self.canvas2.get_tk_widget().grid(row=3, rowspan=11, column=9, columnspan=5)
-        # self.canvas2.show()
-        self.picture2()
+        self.canvas2.show()
 
         print('init：创建canvas3')
         self.figure3 = Figure(figsize=(4, 3), dpi=100)
         self.canvas3 = FigureCanvasTkAgg(self.figure3, master=self.root)
         self.canvas3.get_tk_widget().grid(row=14, rowspan=11, column=9, columnspan=5)
-        # self.canvas3.show()
-        self.picture3()
+        self.canvas3.show()
 
     def updata(self):
         print('updata:更新数据')
@@ -102,43 +116,20 @@ class draw(object):
         self.action2.configure(state='disabled')  # Disable the Button Widget
 
     def picture1(self):
-        self.compareByJob('java', 'c++')
-        # print('picture1')
-        # num = self.df.getJobInCity()
-        # # sorted返回的是一个列表
-        # num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])
-        #
-        # # 清空图像，以使得前后两次绘制的图像不会重叠
-        # self.figure1.clf()
-        # fig = self.figure1.add_subplot(111)
-        # time = datetime.datetime.now()
-        # fig.set_title(str(time.year) + '/' + str(time.month) +
-        #               '/' + str(time.day) + '职位分布图')
-        # fig.bar(num.keys(), num.values(), label="职位数")
-        # # 绘制文字，显示柱状图的值
-        # for x, y in zip(num.keys(), num.values()):
-        #     fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=12)
-        # self.canvas1.show()
+        # self.compareByJob('java', 'c++')
+        self.countAllJobs()
 
     def picture2(self):
-        self.countByCity('北京')
-        # # self.figure2.clf()
-        # print('picture2')
-        # fig = self.figure2.add_subplot(111)
-        # fig.set_title('picture2')
-        # fig.plot([1, 2, 3, 4, 5, 6], [1, 4, 9, 16, 25, 36])
-        # self.canvas2.show()
+        # self.countByCity('北京')
+        self.jobsCountInCity_pie('深圳')
 
     def picture3(self):
-        self.countByJob('java')
-        # self.figure3.clf()
-        # print('picture3')
-        # fig = self.figure3.add_subplot(111)
-        # fig.set_title('picture3')
-        # fig.plot([1, 2, 3, 4, 5, 6], [6, 5, 4, 3, 2, 1])
-        # self.canvas3.show()
-
+        # self.countByJob('java')
+        self.cityCountOfjob_pie('java')
     def compare(self, value1, value2, flag):
+        '''对两个字典进行比较，比如：
+            job1和job2的城市分布前12名
+            city1和city2的job分布前12名'''
         data = self.df.compress(value1, value2, flag)
         num1 = np.array([v[0] for v in data.values()])
         num2 = np.array([v[1] for v in data.values()])
@@ -166,16 +157,34 @@ class draw(object):
     def compareByJob(self, job1, job2):
         self.compare(job1, job2, 0)
 
-    def count(self,value, flag):
-        if flag == 0:   # 统计某座城市的招聘信息
-            count = self.df.getCityInfo(value)  # 字典{job: num}
-        else:       # 统计某种技术的城市分布信息
-            count = self.df.getJobsInfo(value)  # 字典{city: num}
-        return count
+    def count(self, value, flag):
+        if flag == 0:  # 统计某座城市的招聘信息
+            return self.df.jobsInCity(value)  # 字典{job: num}
+        else:  # 统计某种技术的城市分布信息
+            return self.df.cityOfJob(value)  # 字典{city: num}
+
+    def countAllJobs(self):
+        '''统计每个城市的所有职位数，不分行业'''
+        print('countAllJobs')
+        num = self.df.getJobInCity()
+        num = dict(sorted(num.items(), key=lambda x: x[1], reverse=True)[:10])  # {city: num}
+
+        # 清空图像，以使得前后两次绘制的图像不会重叠
+        self.figure1.clf()
+        fig = self.figure1.add_subplot(111)
+        # time = datetime.datetime.now()
+        # fig.set_title(str(time.year) + '/' + str(time.month) +
+        #               '/' + str(time.day) + '职位分布图')
+        fig.set_title('城市职位数分布图')
+        fig.bar(num.keys(), num.values(), label="职位数")
+        # 绘制文字，显示柱状图的值
+        for x, y in zip(num.keys(), num.values()):
+            fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=12)
+        self.canvas1.show()
 
     def countByJob(self, job):
-        '''计某种技术的城市分布信息'''
-        count = self.df.getJobsInfo(job)  # 字典{job: num}
+        '''统计某种技术的城市分布信息'''
+        count = self.df.cityOfJob(job)  # 字典{city: num}
         print('countByJob')
         self.figure3.clf()
         fig = self.figure3.add_subplot(111)
@@ -186,22 +195,57 @@ class draw(object):
             fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=8)
         self.canvas3.show()
 
-
-
     def countByCity(self, city):
         '''某座城市的招聘信息统计'''
-        count = self.df.getCityInfo(city)  # 字典{job: num}
+        count = self.df.jobsInCity(city)  # 字典{job: num}
         print('countByCity')
         self.figure2.clf()
         fig = self.figure2.add_subplot(111)
         fig.set_title('countByCity')
         # fig.plot(count.keys(), count.values())
         fig.bar(count.keys(), count.values(), label='label')
-        for x, y in zip(count.keys(),count.values()):
+        for x, y in zip(count.keys(), count.values()):
             fig.text(x, y + 5, y, ha='center', va='bottom', fontsize=8)
         self.canvas2.show()
 
+    def cityCountOfjob_pie(self,job):
+        data = self.df.cityOfJob(job)
+        data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:6])
+        Z = np.ones(len(data))
+        self.figure3.clf()
+        fig = self.figure3.add_subplot(111)
+        fig.set_title('职位城市分布图')
+        fig.pie(data.values())#, explode=Z * .05)
+        fig.set_aspect('equal')
+        fig.set_xticks([])
+        fig.set_yticks([])
+        self.canvas3.show()
+    def jobsCountInCity_pie(self, city):
+        '''某座城市的职位分布饼图'''
+        data = self.df.jobsInCity(city)  # 字典{job: num}
+        data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:6])
+        # print(data)
+        Z = np.ones(len(data))
+        # Z[-1] *= 2
+        s = sum(data.values())
 
+        self.figure2.clf()
+        fig = self.figure2.add_subplot(111)
+        fig.set_title('城市职位数分布图')
+        # fig.axes(0, 0, 0.8, 0.8)
+        # fig.pie(Z, explode=Z * .05, colors=['%f' % (i / s) for i in data.values()],
+        #         wedgeprops={"linewidth": 1, "edgecolor": "black"})
+        # fig.pie(Z, explode=Z * .03, colors=['%f' % (np.arctan2(i + 1, s + 1)) for i in data.values()])
+        # fig.pie(Z, explode=Z * .05, colors=['%f' % (((i+1) / s)) for i in data.values()])
+        fig.pie(data.values())#, explode=Z * .05)
+        # def f(x, y):
+        #     return (1 - x / 2 + x ** 5 + y ** 3) * np.exp(-x ** 2 - y ** 2)
+        # fig.pie(Z, explode=Z * .03, colors=['%f' % (100 * f(i,s)) for i in data.values()])
+        fig.set_aspect('equal')
+        fig.set_xticks([])
+        fig.set_yticks([])
+
+        self.canvas2.show()
 
     def reDraw(self):
         print('redraw重画')
@@ -254,7 +298,6 @@ class ToolTip(object):
 
 # createToolTip(spin, '这是一个Spinbox.')
 # 悬浮框提醒控件
-
 
 def createToolTip(widget, text):
     toolTip = ToolTip(widget)
