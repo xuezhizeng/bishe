@@ -26,8 +26,10 @@ class DataOptions(object):
         # Index(['网址', '工作名称', '公司名称', '公司网址', '福利', '月工资', '发布日期', '经验', '人数', '工作地点',
         #        '工作性质', '最低学历', '职位类别', '公司规模', '公司性质', '公司行业', '职位描述', '是否失效'])
         self.df = pd.read_sql(sql=sql, con=conn)
-        self.jobs = ['java', 'c++', 'python', 'c#',
-                     'c', 'linux', '大数据', 'web', '数据库']
+        # self.jobs = ['java', 'c++', 'python', 'c#',
+        #              'c', 'linux', '大数据', 'web', '数据库']
+        self.jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
+                     'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
         conn.close()
         # self.format()
         # oracle.save_to_oracle(self.df, 'info')
@@ -82,9 +84,15 @@ class DataOptions(object):
     def getJobInCity(self):
         '''统计职位数分布情况
             返回字典'''
-        return dict(self.df.工作地点.value_counts())
+        return dict(self.df.工作地点.value_counts())  # {city: nums}
 
     def getAllJobNum(self):
+        num = {}
+        for job in self.jobs:
+            num[job] = sum(self.cityOfJob(job).values())
+        return num # {job: num}
+
+    def getAllJobNum_v0(self):
         '''找出各职位的招聘信息
             这个方法已经过时了，应该用下面的新的cityOfJob'''
 
@@ -101,8 +109,7 @@ class DataOptions(object):
         for job in self.jobs:
             # print(job)
             num[job] = jobNum(self.df, job)
-
-        return num
+        return num  # {job: nums}
 
     # 得找出具体职位的城市分布
     # 这是一张三维图
@@ -142,6 +149,7 @@ class DataOptions(object):
         else:
             return False
 
+
     def cityOfJob(self, job):
         '''找出某职位的城市分布信息
             返回字典{city: num}'''
@@ -155,12 +163,14 @@ class DataOptions(object):
         '''确定一个城市的职位统计
         :return:{job, num}'''
         data = self.df[self.df.工作地点 == city]
-        jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
-                'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+        # jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
+        #         'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
         count = {}
-        for job in jobs:
+        for job in self.jobs:
+            print(job)
             count[job] = len(
                 data[data.apply(self.process, axis=1, args=([job]))])  # 是df的子集
+        print(count)
         return count  # 返回字典{job: num}
 
     def compress(self, value1, value2, flag):
@@ -171,7 +181,7 @@ class DataOptions(object):
             d1 = self.jobsInCity(value1)  # value1的具体招聘信息，是字典{job: num}
             d2 = self.jobsInCity(value2)  # value2的具体招聘信息，是字典{job: num}
         data1 = dict(sorted(d1.items(), key=lambda x: x[
-                     1], reverse=True)[:12])  # 获取前12名
+            1], reverse=True)[:12])  # 获取前12名
         data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:12])
         # print(d1,'\n',d2,'\n',data1,'\n',data2)
         l2 = list(data2.keys())
