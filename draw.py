@@ -10,7 +10,7 @@ import matplotlib
 
 matplotlib.use('TkAgg')
 # 解决负号不正常显示问题
-matplotlib.rcParams['axes.unicode_minus']=False
+matplotlib.rcParams['axes.unicode_minus'] = False
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import ttk
@@ -36,8 +36,6 @@ class draw(object):
         self.log.saveInfo('实例化draw')
         self.df = dp.DataOptions()
         # 每个城市的职位总数
-        self.citys = self.df.getJobInCity()  # {'武汉':123, '北京':231}
-        self.jobs = self.df.getAllJobNum()  # {'java':234, 'python':234}
         self.root = tk.Tk()
         self.root.title('基于Python技术的基础数据可视化应用')
         # self.root.setvar()
@@ -47,11 +45,15 @@ class draw(object):
         self.root.geometry('1000x630+100+30')
         self.root.resizable(0, 0)
         self.analytic = ""
+        self.values = {
+            'job_all': ('all', 'Java', 'C/C++', 'Python', 'C#', '区块链', 'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET'),
+            'city_all': ('all', '北京', '上海', '广州', '深圳', '南京', '成都', '杭州', '武汉', '西安', '郑州'),
+            'job': ('all', 'Java', 'C/C++', 'Python', 'C#', '区块链', 'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET'),
+            'city': ('all', '北京', '上海', '广州', '深圳', '南京', '成都', '杭州', '武汉', '西安', '郑州')}
 
         self.createCombobox()
         self.createButton()
         self.creatCanvas()
-
 
     # def func(self):
 
@@ -64,11 +66,11 @@ class draw(object):
         self.value1 = tk.StringVar()
         self.Chosen1 = ttk.Combobox(
             self.root, width=12, textvariable=self.value1)
-        jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
-                'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
-        self.Chosen1['values'] = jobs
+        # jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
+        #         'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+        self.Chosen1['values'] = self.values['job']
         self.Chosen1.grid(row=0, column=1,
-                             columnspan=2, sticky='W')
+                          columnspan=4, sticky='W')
         self.Chosen1.current(3)  # 设置初始显示值，值为元组['values']的下标
         self.Chosen1.config(state='readonly')  # 设为只读模式
         createToolTip(self.Chosen1, '选择1.')
@@ -78,92 +80,94 @@ class draw(object):
         self.value2 = tk.StringVar()
         self.Chosen2 = ttk.Combobox(
             self.root, width=12, textvariable=self.value2)
-        self.Chosen2['values'] = jobs
+        self.Chosen2['values'] = self.values['job']
         self.Chosen2.grid(row=1, column=1,
-                            columnspan=2, sticky='W')
+                          columnspan=4, sticky='W')
         self.Chosen2.current(2)  # 设置初始显示值，值为元组['values']的下标
         self.Chosen2.config(state='readonly')  # 设为只读模式
         createToolTip(self.Chosen2, '选择2.')
 
-
-
-
-        print('init：创建cityChosen')
-        self.city = tk.StringVar()
-        self.cityChosen = ttk.Combobox(
-            self.root, width=12, textvariable=self.city)
-        citys = ('all', '北京', '上海', '广州', '深圳',
-                 '南京', '成都', '杭州', '武汉', '西安', '郑州')
-        self.cityChosen['values'] = citys
-        self.cityChosen.grid(row=0, column=6,
-                             columnspan=2, sticky='W')
-        self.cityChosen.current(0)  # 设置初始显示值，值为元组['values']的下标
-        self.cityChosen.config(state='readonly')  # 设为只读模式
-        createToolTip(self.cityChosen, '选择城市.')
-
-        # Adding a Combobox
-        print('init：创建jobChosen')
-        self.job = tk.StringVar()
-        self.jobChosen = ttk.Combobox(
-            self.root, width=12, textvariable=self.job)
-        jobs = ('all', 'Java', 'C/C++', 'Python', 'C#', '区块链',
-                'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
-        self.jobChosen['values'] = jobs
-        self.jobChosen.grid(row=1, column=6,
-                            columnspan=2, sticky='W')
-        self.jobChosen.current(0)  # 设置初始显示值，值为元组['values']的下标
-        self.jobChosen.config(state='readonly')  # 设为只读模式
-        createToolTip(self.jobChosen, '选择技术.')
-
-
-
-
-
-
-
-    def createButton(self):
-        # Adding a Button
-        self.log.saveInfo('创建按钮')
-
         print('init：创建action0')
         self.action0 = ttk.Button(
             self.root, text="比较", width=10, command=self.compare)
-        self.action0.grid(row=0, rowspan=2, column=3,
-                          columnspan=2)  # , ipady=7)
+        self.action0.grid(row=0, rowspan=2, column=6)
+
+
+        # 创建单选框
+        self.createRadiobutton()
+        # Adding a Combobox
+        print('init：创建jobChosen')
+        self.Combobox1Value = tk.StringVar()
+        self.Combobox1 = ttk.Combobox(
+            self.root, width=12, textvariable=self.Combobox1Value)
+        # jobs = ('all', 'Java', 'C/C++', 'Python', 'C#', '区块链',
+        #         'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+        self.Combobox1['values'] = self.values['job_all']
+        self.Combobox1.grid(row=1, column=8,
+                            columnspan=4, sticky='W')
+        self.Combobox1.current(0)  # 设置初始显示值，值为元组['values']的下标
+        self.Combobox1.config(state='readonly')  # 设为只读模式
+        createToolTip(self.Combobox1, '选择技术.')
 
         print('init：创建action1')
         self.action1 = ttk.Button(
             self.root, text="重绘", width=10, command=self.reDraw)
-        self.action1.grid(row=0, rowspan=2, column=8,
-                          columnspan=2)  # , ipady=7)
+        self.action1.grid(row=0, rowspan=2, column=12)
 
-
-        # Adding a Button
         print('init：创建action2')
         self.action2 = ttk.Button(
             self.root, text="后台更新数据", width=12, command=self.updata)
-        self.action2.grid(row=0, rowspan=2, column=11,
-                          columnspan=2)  # , ipady=7)
+        self.action2.grid(row=0, rowspan=2, column=15,
+                          columnspan=4)  # , ipady=7)
+
+    def createButton(self):
+        # Adding a Button
+        # self.log.saveInfo('创建按钮')
+
+        pass
+
+        # columnspan=2)  # , ipady=7)
+
+
+        # columnspan=2)  # , ipady=7)
+
+        # Adding a Button
+
+
+    def createRadiobutton(self):
+        self.CityorJob = tk.IntVar()
+        self.CityorJob.set(0)  # 初始化为技术
+        tk.Radiobutton(self.root, text='技术', variable=self.CityorJob, value=0,
+                       command=self.echoRadiobutton).grid(row=0, column=8, sticky=tk.W)
+        tk.Radiobutton(self.root, text='城市', variable=self.CityorJob, value=1,
+                       command=self.echoRadiobutton).grid(row=0, column=9, sticky=tk.W)
 
     def creatCanvas(self):
         self.log.saveInfo('创建画板')
         # print('init：创建canvas1')
         self.figure1 = Figure(figsize=(6, 6), dpi=100)
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self.root)
-        self.canvas1.get_tk_widget().grid(row=2, rowspan=4, column=0, columnspan=9)
+        self.canvas1.get_tk_widget().grid(row=2, rowspan=4, column=0, columnspan=18)
         self.canvas1.show()
 
         # print('init：创建canvas2')
         self.figure2 = Figure(figsize=(4, 3), dpi=100)
         self.canvas2 = FigureCanvasTkAgg(self.figure2, master=self.root)
-        self.canvas2.get_tk_widget().grid(row=2, rowspan=2, column=9, columnspan=5)
+        self.canvas2.get_tk_widget().grid(row=2, rowspan=2, column=18, columnspan=10)
         self.canvas2.show()
 
         # print('init：创建canvas3')
         self.figure3 = Figure(figsize=(4, 3), dpi=100)
         self.canvas3 = FigureCanvasTkAgg(self.figure3, master=self.root)
-        self.canvas3.get_tk_widget().grid(row=4, rowspan=2, column=9, columnspan=5)
+        self.canvas3.get_tk_widget().grid(row=4, rowspan=2, column=18, columnspan=10)
         self.canvas3.show()
+
+    def echoRadiobutton(self):
+        print(self.CityorJob.get())
+        if self.CityorJob.get() == 0:
+            self.Combobox1['values'] = self.values['job_all']
+        else:
+            self.Combobox1['values'] = self.values['city_all']
 
     def updata(self):
         self.log.saveInfo('更新数据')
@@ -194,8 +198,8 @@ class draw(object):
             job1和job2的城市分布前12名
             city1和city2的job分布前12名'''
         # self.log.saveInfo('比较{}和{}'.format(value1, value2))
-        value1=self.value1.get()
-        value2=self.value2.get()
+        value1 = self.value1.get()
+        value2 = self.value2.get()
         self.log.saveInfo('比较{}和{}'.format(value1, value2))
         data = self.df.compress(value1, value2)
         # print(data)
@@ -301,7 +305,7 @@ class draw(object):
 
     def cityCountOfjob_pie(self, job, figure, canvas):
         '''某种职业的城市分布饼图'''
-        self.log.saveInfo('绘制%{}的城市分布饼图'.format(job))
+        self.log.saveInfo('绘制{}的城市分布饼图'.format(job))
         data0 = self.df.cityOfJob(job)
         data = dict(
             sorted(data0.items(), key=lambda x: x[1], reverse=True)[:6])
@@ -342,7 +346,7 @@ class draw(object):
         data['其他'] = sum(data0.values()) - sum(data.values())
         figure.clf()
         fig = figure.add_subplot(111)
-        fig.set_title('%s职位统计图' % city)
+        fig.set_title('{}职位统计图'.format(city))
         fig.pie(data.values(), labels=data.keys(), autopct='%1.1f%%')
         fig.set_aspect('equal')
         fig.set_xticks([])
@@ -352,9 +356,10 @@ class draw(object):
     def allCity_pie(self, figure, canvas):
         self.log.saveInfo('绘制城市职位概总饼图')
         '''所有城市的所有职位的总图'''
+        citys = self.df.getJobInCity()  # {'武汉':123, '北京':231}
         data = dict(
-            sorted(self.citys.items(), key=lambda x: x[1], reverse=True)[:6])
-        data['其他'] = sum(self.citys.values()) - sum(data.values())
+            sorted(citys.items(), key=lambda x: x[1], reverse=True)[:6])
+        data['其他'] = sum(citys.values()) - sum(data.values())
         figure.clf()
         fig = figure.add_subplot(111)
         fig.set_title('城市职位总图')
@@ -367,9 +372,10 @@ class draw(object):
     def allJobs_pie(self, figure, canvas):
         self.log.saveInfo('绘制职位信息概总饼图')
         '''所有职位的所有城市的总图'''
+        jobs = self.df.getAllJobNum()  # {'java':234, 'python':234}
         data = dict(
-            sorted(self.jobs.items(), key=lambda x: x[1], reverse=True)[:6])
-        data['其他'] = sum(self.jobs.values()) - sum(data.values())
+            sorted(jobs.items(), key=lambda x: x[1], reverse=True)[:6])
+        data['其他'] = sum(jobs.values()) - sum(data.values())
         figure.clf()
         fig = figure.add_subplot(111)
         fig.set_title('职位总图')
@@ -383,30 +389,32 @@ class draw(object):
         # print('redraw重画')
         # print(self.city.get(), self.job.get())
         self.log.saveInfo('重绘')
-        city = self.city.get()
+        # citys = self.df.getJobInCity()  # {'武汉':123, '北京':231}
+        # city = self.city.get()
         # city = '深圳'
-        job = self.job.get()
-        if job == 'all' and city == 'all':  # 概况
+        # job = self.job.get()
+        value = self.Combobox1Value.get()
+        if value == 'all':  # 概况
             print('No1')
             # self.countAllJobs(self.figure1, self.canvas1)
             self.allCity_pie(self.figure2, self.canvas2)
             self.allJobs_pie(self.figure3, self.canvas3)
-        elif job == 'all':  # 某座城市的职业分布
+        elif self.CityorJob.get() == 0:  # 某种职业的城市分布
             print('No2')
-            self.jobsCountInCity(city, self.figure2, self.canvas2)
-            self.jobsCountInCity_pie(city, self.figure3, self.canvas3)
-        elif city == 'all':  # 某种职业的城市分布
-            self.cityCountOfjob(job, self.figure2, self.canvas2)
-            self.cityCountOfjob_pie(job, self.figure3, self.canvas3)
-        else:  # 某种做城市的某种职业的情况
-            pass
+            self.cityCountOfjob(value, self.figure2, self.canvas2)
+            self.cityCountOfjob_pie(value, self.figure3, self.canvas3)
+        else:  # 某座城市的职业分布
+            print('No3')
+            self.jobsCountInCity(value, self.figure2, self.canvas2)
+            self.jobsCountInCity_pie(value, self.figure3, self.canvas3)
+        # else:  # 某种做城市的某种职业的情况
+        #     pass
 
     def show(self):
         print('show: mainloop')
         self.reDraw()
         self.compare()
         self.root.mainloop()
-
 
 
 # ===================================================================

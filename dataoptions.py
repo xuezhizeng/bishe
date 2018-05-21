@@ -27,8 +27,9 @@ class DataOptions(object):
         self.df = pd.read_sql(sql=sql, con=conn)
         # self.jobs = ['java', 'c++', 'python', 'c#',
         #              'c', 'linux', '大数据', 'web', '数据库']
-        self.jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
-                     'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+        self.jobs = (
+            'Java', 'C/C++', 'Python', 'C#', '区块链', 'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET', 'PHP', 'IOS',
+            'Android', 'CSS', 'FPGA', '算法')
         conn.close()
         self.log = log.log()
         # self.format()
@@ -138,13 +139,6 @@ class DataOptions(object):
         '''找出某职位的具体招聘信息
             返回的是df的一个子集'''
 
-        # def process(x, job):
-        #     # "java"/"JAVA"/"Java"
-        #     if job in x.工作名称 or job.upper() in x.工作名称 or job.capitalize() in x.工作名称:
-        #         return True
-        #     else:
-        #         return False
-
         # 利用apply方法，已经可以提取出特定招聘信息的条目了
         self.log.saveInfo('筛选{}的招聘信息'.format(job))
         return self.df[self.df.apply(self.process, axis=1, args=([job]))]
@@ -225,6 +219,3 @@ if __name__ == '__main__':
 # t=d.cityOfJob('java')
 # print(t)
 # return t
-
-# 1、某个城市的工作统计
-# 2、某项工作的城市统计
