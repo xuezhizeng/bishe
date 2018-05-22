@@ -21,10 +21,14 @@ class DataOptions(object):
         except(cx_Oracle.DatabaseError, cx_Oracle.OperationalError) as e:
             exit(-1)
         sql = 'select * from info'
+        sql = 'select * from city_job'
 
         # Index(['网址', '工作名称', '公司名称', '公司网址', '福利', '月工资', '发布日期', '经验', '人数', '工作地点',
         #        '工作性质', '最低学历', '职位类别', '公司规模', '公司性质', '公司行业', '职位描述', '是否失效'])
+        self.index = ['.NET', 'Android', 'C#', 'C/C++', 'CSS', 'FPGA', 'HTML5', 'IOS', 'Java', 'Linux', 'PHP', 'Python',
+                      'Web', '区块链', '大数据', '数据库', '算法']
         self.df = pd.read_sql(sql=sql, con=conn)
+        self.df.index = self.index
         # self.jobs = ['java', 'c++', 'python', 'c#',
         #              'c', 'linux', '大数据', 'web', '数据库']
         self.jobs = (
@@ -85,11 +89,11 @@ class DataOptions(object):
 
     def statisticalAlltoOracle(self):
         '''统计所有的城市职业信息，并返回dataframe
-            这个函数应该是在爬虫爬去所有的数据之后立即执行
+            这个函数应该是在爬虫爬去所有的数据之后，西安执行format格式化，然后执行这个函数
             执行完这个函数后应该将ddff保存到数据库cty_job中
             后续需要分析的话就直接读取数据库city_job中的数据就行了'''
         citys = tuple(set(self.df.工作地点))
-        l=[]
+        l = []
         # print(self.ddff)
         for city in citys:
             cityInfo = self.df[self.df.工作地点 == city]
@@ -103,64 +107,55 @@ class DataOptions(object):
             l.append(count)
             # self.ddff = self.ddff.append(count, ignore_index=True)
             # self.ddff[city] = count
-        self.ddff = pd.DataFrame(l,index=citys)
+        self.ddff = pd.DataFrame(l, index=citys)
         self.ddff = self.ddff.T
         print(self.ddff)
         print(self.ddff)
         return self.ddff
 
-
-
     def getJobInCity(self):
         '''统计职位数分布情况
             返回字典'''
+        # self.log.saveInfo('统计所有职位分布')
+        # return dict(self.df.工作地点.value_counts())  # {city: nums}
+
         self.log.saveInfo('统计所有职位分布')
-        return dict(self.df.工作地点.value_counts())  # {city: nums}
+        count = {}
+        for city in self.df.columns:
+            count[city] = sum(self.df[city])
+        return count  # {city: nums}
 
     def cityOfJob(self, job):
         '''找出某职位的城市分布信息
             返回字典{city: num}'''
+        # self.log.saveInfo('统计{}的城市分布信息'.format(job))
+        # jobinfo = self.df[self.df.apply(
+        #     self.process, axis=1, args=([job]))]  # 是df的子集
+        # data = dict(collections.Counter(list(jobinfo.工作地点)))
+        # # 返回字典{city: num}
+        # return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
+
         self.log.saveInfo('统计{}的城市分布信息'.format(job))
-        jobinfo = self.df[self.df.apply(
-            self.process, axis=1, args=([job]))]  # 是df的子集
-        data = dict(collections.Counter(list(jobinfo.工作地点)))
-        # 返回字典{city: num}
-        return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
+        return dict(self.df.ix[job])
 
     def getAllJobNum(self):
+        # self.log.saveInfo('统计所有职位量')
+        # num = {}
+        # for job in self.jobs:
+        #     num[job] = sum(self.cityOfJob(job).values())
+        # return num  # {job: num}
+
         self.log.saveInfo('统计所有职位量')
-        num = {}
-        for job in self.jobs:
-            num[job] = sum(self.cityOfJob(job).values())
-        return num  # {job: num}
-
-    def getAllJobNum_v0(self):
-        '''找出各职位的招聘信息
-            这个方法已经过时了，应该用下面的新的cityOfJob'''
-        self.log.saveInfo('统计职位量')
-
-        def jobNum(df, job):
-            # re.I: 正则忽略大小写
-            if 'c++' == job or 'C++' == job:
-                job = 'c\+\+'
-            elif 'c' == job or 'C' == job:
-                job += '[^+#]'
-            p = re.compile(job, re.I)
-            return len(list(filter(lambda s: re.search(p, s), df.工作名称)))
-
-        num = {}
-        for job in self.jobs:
-            # print(job)
-            num[job] = jobNum(self.df, job)
-        return num  # {job: nums}
-
-    # 得找出具体职位的城市分布
-    # 这是一张三维图
+        count = {}
+        for job in self.df.index:
+            count[job] = sum(self.df.ix[job])
+        return count  # {job: num}
 
     def jobinfo(self, job):
         '''找出各职位的具体招聘信息'''
         # re.I: 正则忽略大小写
         self.log.saveInfo('筛选{}的招聘信息'.format(job))
+        pass
         if 'c++' == job or 'C++' == job:
             job = 'c\+\+'
         elif 'c' == job or 'C' == job:
@@ -179,6 +174,7 @@ class DataOptions(object):
 
         # 利用apply方法，已经可以提取出特定招聘信息的条目了
         self.log.saveInfo('筛选{}的招聘信息'.format(job))
+        pass
         return self.df[self.df.apply(self.process, axis=1, args=([job]))]
 
     def process(self, x, job):
@@ -190,17 +186,20 @@ class DataOptions(object):
     def jobsInCity(self, city):
         '''确定一个城市的职位统计
         :return:{job, num}'''
+        # self.log.saveInfo('统计{}的招聘情况'.format(city))
+        # data = self.df[self.df.工作地点 == city]
+        # # jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
+        # #         'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+        # count = {}
+        # for job in self.jobs:
+        #     print(job)
+        #     count[job] = len(
+        #         data[data.apply(self.process, axis=1, args=([job]))])  # 是df的子集
+        # print(count)
+        # return count  # 返回字典{job: num}
+
         self.log.saveInfo('统计{}的招聘情况'.format(city))
-        data = self.df[self.df.工作地点 == city]
-        # jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
-        #         'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
-        count = {}
-        for job in self.jobs:
-            print(job)
-            count[job] = len(
-                data[data.apply(self.process, axis=1, args=([job]))])  # 是df的子集
-        print(count)
-        return count  # 返回字典{job: num}
+        return dict(self.df[city])
 
     def compress(self, value1, value2):
         self.log.saveInfo('比较{}和{}'.format(value1, value2))
@@ -213,8 +212,8 @@ class DataOptions(object):
         d1 = self.cityOfJob(value1)  # value1的具体招聘信息，是字典{city: num}
         d2 = self.cityOfJob(value2)  # value2的具体招聘信息，是字典{city: num}
         data1 = dict(sorted(d1.items(), key=lambda x: x[
-            1], reverse=True)[:16])  # 获取前12名
-        data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:16])
+            1], reverse=True)[:12])  # 获取前12名
+        data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:12])
         print('d1:', d1, '\n', 'd2:', d2, '\n',
               'data1:', data1, '\n', 'data2:', data2)
         l2 = list(data2.keys())
@@ -225,27 +224,18 @@ class DataOptions(object):
         for city in l:
             data[city] = (d1[city], d2[city])
         print(data)
-        return data
+        return data # {'北京': ('324', '532')}
 
     def jobRequest(self, job):
         '''
-        统计职职位要求
+        统计职位所占比
         :return:
         '''
         self.log.saveInfo('%{}占比'.format(job))
         jobNums = self.getAllJobNum()
-        count = reduce(lambda x, y: x + y, jobNums.values())
-        return jobNums[job] / count
+        return jobNums[job] / sum(jobNums.values())
 
 
-# df=getData()
-# print(getJobInfo(df,'c#'))
 if __name__ == '__main__':
     d = DataOptions()
-    # d.compress('java', 'c++')
-    # d.jobsInCity('北京')
     d.statisticalAlltoOracle()
-    # print(d.getJobInCity())
-# t=d.cityOfJob('java')
-# print(t)
-# return t
