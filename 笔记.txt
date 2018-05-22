@@ -48,10 +48,22 @@ Re模块中预编译compile函数的使用：
 
 
 
+self.jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链',
+                     'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET')
+                     'PHP', 'IOS', 'Android', 'CSS', 'FPGA', '算法'
 
 
 
+jobs = ('Java', 'C/C++', 'Python', 'C#', '区块链', 'Linux', '大数据', 'Web', '数据库', 'HTML5', '.NET', 'PHP', 'IOS', 'Android', 'CSS', 'FPGA', '算法')
 
 
+所有城市
+city=tuple(set(self.df.工作地点))
 
+
+每座城市的所有招聘信息
+ self.df[self.df.工作地点 == '北京']
+
+df.ix['IOS']    # 按行获取
+df.ix[[2,4]]    # 获取第2、4行数据
 

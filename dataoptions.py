@@ -87,6 +87,15 @@ class DataOptions(object):
     # # 那下一次就直接从数据库里取zhaopin_city了
     # save_to_oracle(df, "zhaopin_city")
 
+    def process(self, x, job):
+        if job == 'C/C++':
+            job = 'c++'
+        if job in x.工作名称 or job.upper() in x.工作名称 or job.capitalize() in x.工作名称 or job in x.职位描述 or job.upper() in x.职位描述 or job.capitalize() in x.职位描述:
+            return True
+        else:
+            return False
+
+
     def statisticalAlltoOracle(self):
         '''统计所有的城市职业信息，并返回dataframe
             这个函数应该是在爬虫爬去所有的数据之后，西安执行format格式化，然后执行这个函数
@@ -103,14 +112,14 @@ class DataOptions(object):
                 # print(job)
                 count[job] = len(
                     cityInfo[cityInfo.apply(self.process, axis=1, args=([job]))])  # 是df的子集
-            print(count)  # 字典{job: num}
+            # print(count)  # 字典{job: num}
             l.append(count)
             # self.ddff = self.ddff.append(count, ignore_index=True)
             # self.ddff[city] = count
         self.ddff = pd.DataFrame(l, index=citys)
         self.ddff = self.ddff.T
-        print(self.ddff)
-        print(self.ddff)
+        # print(self.ddff)
+        # print(self.ddff)
         return self.ddff
 
     def getJobInCity(self):
@@ -136,7 +145,9 @@ class DataOptions(object):
         # return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
 
         self.log.saveInfo('统计{}的城市分布信息'.format(job))
-        return dict(self.df.ix[job])
+        # print('统计{}的城市分布信息'.format(job))
+        # print(self.df.ix[job])
+        return dict(self.df.ix[job])    # 返回字典{city: num}
 
     def getAllJobNum(self):
         # self.log.saveInfo('统计所有职位量')
@@ -177,11 +188,6 @@ class DataOptions(object):
         pass
         return self.df[self.df.apply(self.process, axis=1, args=([job]))]
 
-    def process(self, x, job):
-        if job in x.工作名称 or job.upper() in x.工作名称 or job.capitalize() in x.工作名称 or job in x.职位描述 or job.upper() in x.职位描述 or job.capitalize() in x.职位描述:
-            return True
-        else:
-            return False
 
     def jobsInCity(self, city):
         '''确定一个城市的职位统计
@@ -214,16 +220,16 @@ class DataOptions(object):
         data1 = dict(sorted(d1.items(), key=lambda x: x[
             1], reverse=True)[:12])  # 获取前12名
         data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:12])
-        print('d1:', d1, '\n', 'd2:', d2, '\n',
-              'data1:', data1, '\n', 'data2:', data2)
+        # print('d1:', d1, '\n', 'd2:', d2, '\n',
+        #       'data1:', data1, '\n', 'data2:', data2)
         l2 = list(data2.keys())
         l1 = list(data1.keys())
         l = [v for v in l1 if v in l2]
-        print(l)
+        # print(l)
         data = {}
         for city in l:
             data[city] = (d1[city], d2[city])
-        print(data)
+        # print(data)
         return data # {'北京': ('324', '532')}
 
     def jobRequest(self, job):

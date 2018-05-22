@@ -85,7 +85,7 @@ class worm(object):
             #     str(i))
             # p='&p={}'.format(str(i))
             url = self.url + '&p=%s' % str(i)
-            print('get content: ' + url)
+            # print('get content: ' + url)
             # print(type(url))
 
             # url = "http://sou.zhaopin.com/jobs/searchresult.ashx?kw={}&p={}&".format(str(job), str(i)) + city_tmp
@@ -107,7 +107,7 @@ class worm(object):
         '''
 
         # 获取网页内容
-        print("获取网页: " + str(url) + " 有用信息")
+        # print("获取网页: " + str(url) + " 有用信息")
         content = self.get_content(url)
         # 校园招聘的HTML格式与其他不同，所以这里要分开选择
         if 'xiaoyuan' in url:
@@ -209,8 +209,8 @@ class worm(object):
         # links = []
         links = self.get_links_from()
         for url in links:
-            print('获取职位具体信息, 网址: ' + url)
+            # print('获取职位具体信息, 网址: ' + url)
             data = self.get_link_info(url)
             df = df.append(data, ignore_index=True)
-            print(data)
+            # print(data)
         return df

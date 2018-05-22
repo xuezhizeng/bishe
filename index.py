@@ -19,7 +19,7 @@ def get_data(urls):
     df = pd.DataFrame(data=[], columns=columns)
     links = []
     for url in urls:
-        print('获取职位具体信息, 网址: ' + url)
+        # print('获取职位具体信息, 网址: ' + url)
         data = get_link_info(url)
         df = df.append(data, ignore_index=True)
     return df
@@ -32,7 +32,7 @@ def timer(func):
         start = time.time()
         func(*args, **kw)
         end = time.time()
-        print('爬取时间：' + str((end - start) / 60) + 'min')
+        # print('爬取时间：' + str((end - start) / 60) + 'min')
 
     return wrapper
 
@@ -44,21 +44,21 @@ def index(url):
     npage = 1
     # city = ['深圳', '广州']
     # 返回搜索结果列表的所有超链接
-    print('获取' + url + '的所有链接')
+    # print('获取' + url + '的所有链接')
     urls = get_links_from(url)
     # urls = get_links_from(job, npage, city)
 
     # 首先搜索结果进行筛选一遍，因为有些置顶结果有不一样的链接
     # 比如，职位置顶会链接到'https://e.zhaopin.com/products/1/detail.do'
     urls = [u for u in urls if '.htm' in u]
-    print('以下是有效的链接: ')
-    print(urls)
-    print('开始获取具体的职位信息')
+    # print('以下是有效的链接: ')
+    # print(urls)
+    # print('开始获取具体的职位信息')
     df = get_data(urls)
 
     # 写到Oracle数据库中
 
-    print('保存到数据库')
+    # print('保存到数据库')
     # job = 'test'
     job = 'zhaopin'
     save_to_oracle(df, database=job)
