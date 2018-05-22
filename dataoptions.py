@@ -84,9 +84,11 @@ class DataOptions(object):
     # save_to_oracle(df, "zhaopin_city")
 
     def statisticalAlltoOracle(self):
+        '''统计所有的城市职业信息，并返回dataframe
+            这个函数应该是在爬虫爬去所有的数据之后立即执行
+            执行完这个函数后应该将ddff保存到数据库cty_job中
+            后续需要分析的话就直接读取数据库city_job中的数据就行了'''
         citys = tuple(set(self.df.工作地点))
-        # self.ddff = pd.DataFrame(data=[], index=self.jobs)
-        # self.ddff = pd.DataFrame()
         l=[]
         # print(self.ddff)
         for city in citys:
@@ -105,9 +107,6 @@ class DataOptions(object):
         self.ddff = self.ddff.T
         print(self.ddff)
         print(self.ddff)
-        # 存到数据库中去
-        # conn = cx_Oracle.connect("star/star@127.0.0.1/orcl")
-        # cursor = conn.cursor()  # 创建游标对象
         return self.ddff
 
 
