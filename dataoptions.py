@@ -83,14 +83,53 @@ class DataOptions(object):
     # # 那下一次就直接从数据库里取zhaopin_city了
     # save_to_oracle(df, "zhaopin_city")
 
+    def statisticalAlltoOracle(self):
+        citys = tuple(set(self.df.工作地点))
+        # self.ddff = pd.DataFrame(data=[], index=self.jobs)
+        # self.ddff = pd.DataFrame()
+        l=[]
+        # print(self.ddff)
+        for city in citys:
+            cityInfo = self.df[self.df.工作地点 == city]
+            count = {}
+            for job in self.jobs:
+                # 统计一座城市的所有职位量
+                # print(job)
+                count[job] = len(
+                    cityInfo[cityInfo.apply(self.process, axis=1, args=([job]))])  # 是df的子集
+            print(count)  # 字典{job: num}
+            l.append(count)
+            # self.ddff = self.ddff.append(count, ignore_index=True)
+            # self.ddff[city] = count
+        self.ddff = pd.DataFrame(l,index=citys)
+        self.ddff = self.ddff.T
+        print(self.ddff)
+        print(self.ddff)
+        # 存到数据库中去
+        # conn = cx_Oracle.connect("star/star@127.0.0.1/orcl")
+        # cursor = conn.cursor()  # 创建游标对象
+        return self.ddff
+
+
+
     def getJobInCity(self):
         '''统计职位数分布情况
             返回字典'''
         self.log.saveInfo('统计所有职位分布')
         return dict(self.df.工作地点.value_counts())  # {city: nums}
 
+    def cityOfJob(self, job):
+        '''找出某职位的城市分布信息
+            返回字典{city: num}'''
+        self.log.saveInfo('统计{}的城市分布信息'.format(job))
+        jobinfo = self.df[self.df.apply(
+            self.process, axis=1, args=([job]))]  # 是df的子集
+        data = dict(collections.Counter(list(jobinfo.工作地点)))
+        # 返回字典{city: num}
+        return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
+
     def getAllJobNum(self):
-        self.log.saveInfo('统计职位量')
+        self.log.saveInfo('统计所有职位量')
         num = {}
         for job in self.jobs:
             num[job] = sum(self.cityOfJob(job).values())
@@ -144,20 +183,10 @@ class DataOptions(object):
         return self.df[self.df.apply(self.process, axis=1, args=([job]))]
 
     def process(self, x, job):
-        if job in x.工作名称 or job.upper() in x.工作名称 or job.capitalize() in x.工作名称:
+        if job in x.工作名称 or job.upper() in x.工作名称 or job.capitalize() in x.工作名称 or job in x.职位描述 or job.upper() in x.职位描述 or job.capitalize() in x.职位描述:
             return True
         else:
             return False
-
-    def cityOfJob(self, job):
-        '''找出某职位的城市分布信息
-            返回字典{city: num}'''
-        self.log.saveInfo('统计{}的城市分布信息'.format(job))
-        jobinfo = self.df[self.df.apply(
-            self.process, axis=1, args=([job]))]  # 是df的子集
-        data = dict(collections.Counter(list(jobinfo.工作地点)))
-        # 返回字典{city: num}
-        return dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:12])
 
     def jobsInCity(self, city):
         '''确定一个城市的职位统计
@@ -187,7 +216,8 @@ class DataOptions(object):
         data1 = dict(sorted(d1.items(), key=lambda x: x[
             1], reverse=True)[:16])  # 获取前12名
         data2 = dict(sorted(d2.items(), key=lambda x: x[1], reverse=True)[:16])
-        print('d1:', d1, '\n', 'd2:', d2, '\n', 'data1:', data1, '\n', 'data2:', data2)
+        print('d1:', d1, '\n', 'd2:', d2, '\n',
+              'data1:', data1, '\n', 'data2:', data2)
         l2 = list(data2.keys())
         l1 = list(data1.keys())
         l = [v for v in l1 if v in l2]
@@ -214,8 +244,9 @@ class DataOptions(object):
 if __name__ == '__main__':
     d = DataOptions()
     # d.compress('java', 'c++')
-    d.jobsInCity('北京')
-    print(d.getJobInCity())
+    # d.jobsInCity('北京')
+    d.statisticalAlltoOracle()
+    # print(d.getJobInCity())
 # t=d.cityOfJob('java')
 # print(t)
 # return t
