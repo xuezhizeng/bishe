@@ -171,26 +171,14 @@ class draw(object):
 
     def updata(self):
         self.log.saveInfo('更新数据')
-        # print('updata:更新数据')
-        # self.action2.configure(text='Hello')
-        # self.picture1()
-        # self.picture2()
-        # self.picture3()
-        # self.action2.configure(state='disabled')  # Disable the Button Widget
 
     def picture1(self):
-        # self.compareByJob('java', 'c++')
-        # self.countAllJobs()
         pass
 
     def picture2(self):
-        # self.countByCity('北京')
-        # self.jobsCountInCity_pie('深圳')
         pass
 
     def picture3(self):
-        # self.countByJob('java')
-        # self.cityCountOfjob_pie('java')
         pass
 
     def compare(self):
