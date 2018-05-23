@@ -3,7 +3,6 @@
 # 绘图模块：draw.py
 # 封装成pictures类
 import numpy as np
-import datetime
 import matplotlib
 
 matplotlib.use('TkAgg')
@@ -28,7 +27,7 @@ class draw(object):
 
     def __init__(self, ):
         super(draw, self).__init__()
-        self.log = log.log()
+        self.log = log.log('draw')
 
         self.log.saveInfo('实例化draw')
         self.df = dp.DataOptions()
@@ -52,7 +51,7 @@ class draw(object):
         self.creatCanvas()
 
     def createCombobox(self):
-        self.log.saveInfo('创建选择框')
+        self.log.saveInfo('创建调参栏')
         self.value1 = tk.StringVar()
         self.value2 = tk.StringVar()
         self.Chosen1 = ttk.Combobox(self.root, width=12, textvariable=self.value1)
@@ -61,8 +60,8 @@ class draw(object):
         self.Chosen2.grid(row=1, column=9, sticky='W')
         self.Chosen1.config(state='readonly')  # 设为只读模式
         self.Chosen2.config(state='readonly')  # 设为只读模式
-        createToolTip(self.Chosen1, '选择1.')
-        createToolTip(self.Chosen2, '选择2.')
+        createToolTip(self.Chosen1, 'compare 1.')
+        createToolTip(self.Chosen2, 'compare 2.')
         self.Chosen1.bind("<<ComboboxSelected>>", func=self.compare)  # 绑定事件,(下拉列表框被选中时，绑定self.reDraw()函数)
         self.Chosen2.bind("<<ComboboxSelected>>", func=self.compare)  # 绑定事件,(下拉列表框被选中时，绑定self.reDraw()函数)
         self.Chosen1['values'] = self.values['job']
@@ -71,7 +70,7 @@ class draw(object):
         self.Chosen2.current(7)  # 设置初始显示值，值为元组['values']的下标
 
         self.action2 = ttk.Button(self.root, text="后台更新数据", width=12, command=self.updata)
-        self.action2.grid(row=0, rowspan=2, column=14, columnspan=4)  # , ipady=7)
+        self.action2.grid(row=0, rowspan=2, column=14, columnspan=4)
 
         # 创建单选框
         self.CityorJob = tk.IntVar()
@@ -87,10 +86,10 @@ class draw(object):
         self.Combobox1.config(state='readonly')  # 设为只读模式
         self.Combobox1.bind("<<ComboboxSelected>>", func=self.reDraw)  # 绑定事件,(下拉列表框被选中时，绑定self.reDraw()函数)
         self.Combobox1.grid(row=1, column=23, columnspan=3, sticky='W')
-        createToolTip(self.Combobox1, '选择技术.')
+        createToolTip(self.Combobox1, 'Chosen.')
 
     def creatCanvas(self):
-        self.log.saveInfo('创建画板')
+        self.log.saveInfo('创建三块画板')
         self.figure1 = Figure(figsize=(6, 6), dpi=100)
         self.canvas1 = FigureCanvasTkAgg(self.figure1, master=self.root)
         self.canvas1.get_tk_widget().grid(row=2, rowspan=4, column=0, columnspan=18)
@@ -107,6 +106,7 @@ class draw(object):
         self.canvas3.show()
 
     def echoRadiobutton(self):
+        self.log.saveInfo('回应单选按钮')
         if self.CityorJob.get() == 0:
             self.Combobox1['values'] = self.values['job_all']
         else:
@@ -116,7 +116,7 @@ class draw(object):
         self.allJobs_pie(self.figure3, self.canvas3)
 
     def updata(self):
-        self.log.saveInfo('更新数据')
+        self.log.saveInfo('更新源数据')
         w = worm.worm()
         df = w.get_data()  # 爬取数据
         df = self.df.format(df)
@@ -128,7 +128,6 @@ class draw(object):
         '''对两个字典进行比较，比如：
             job1和job2的城市分布前12名
             city1和city2的job分布前12名'''
-        # self.log.saveInfo('比较{}和{}'.format(value1, value2))
         value1 = self.value1.get()
         value2 = self.value2.get()
         self.log.saveInfo('比较{}和{}'.format(value1, value2))
@@ -226,7 +225,6 @@ class draw(object):
         figure.clf()
         fig = figure.add_subplot(111)
         # fig.axes([0.1, 0.1, .8, .8])
-        fig.tight_layout(rect=(0.1, 0.1, 0.9, 0.9))
         fig.set_title('{}职位数分布图'.format(city))
         fig.bar(data.keys(), data.values())
         fig.set_xticklabels(data.keys(), minor=False, rotation=45)
@@ -291,12 +289,11 @@ class draw(object):
             self.jobsCountInCity_pie(value, self.figure3, self.canvas3)
 
     def show(self):
-        self.reDraw()
-        self.compare()
-        self.root.mainloop()
+        self.log.saveInfo('Nothing')
+        pass
+    # ===================================================================
 
 
-# ===================================================================
 # 由于tkinter中没有ToolTip功能，所以自定义这个功能如下
 
 class ToolTip(object):
@@ -353,4 +350,5 @@ if __name__ == '__main__':
     d = draw()
     d.compare()
     d.reDraw()
+    d.show()
     d.root.mainloop()

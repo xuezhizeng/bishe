@@ -23,7 +23,7 @@ class DataOptions(object):
         self.df = pd.read_sql(sql=sql, con=conn)
         self.df.index = self.jobs
         conn.close()
-        self.log = log.log()
+        self.log = log.log('dataoptions')
 
     def format(self, df):
         '''提取城市'''
