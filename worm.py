@@ -8,8 +8,7 @@ import string
 from bs4 import BeautifulSoup
 import formatstaing
 import pandas as pd
-import sys
-import io
+
 
 
 class worm(object):
@@ -34,7 +33,7 @@ class worm(object):
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11"
         ]
 
-        self.urls = 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0'
+        # self.urls = 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0'
 
         # self.urls = ['http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
         # 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
@@ -77,27 +76,30 @@ class worm(object):
         # else:
         #     for i in range(len(city)):
         #         city_tmp += "%2B{}".format(str(city[i]))
-        urls = []
-        npage = 90  # 智联招聘最多就只显示90页
-        for i in range(1, npage + 1):
-            # 这里这个url是囊括了IT行业几乎所有的搜索页面
-            # url = 'https://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160400;160000;300100;160600&jl=全国&p={}&isadv=0'.format(
-            #     str(i))
-            # p='&p={}'.format(str(i))
-            url = self.url + '&p=%s' % str(i)
-            # print('get content: ' + url)
-            # print(type(url))
 
-            # url = "http://sou.zhaopin.com/jobs/searchresult.ashx?kw={}&p={}&".format(str(job), str(i)) + city_tmp
-            # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
-            # 进行URL编码，safe是不编码的字符集
-            url = urllib.parse.quote(url, safe=string.printable)
-            content = self.get_content(url)
-            # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
-            link_urls = content.select('td.zwmc a')
-            for url in link_urls:
-                urls.append(url.get('href'))
-        return (urls)  # 前npage页的职位链接都在这里了
+        # 这里这个urls是囊括了IT行业几乎所有的搜索页面
+        urls = [
+            'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
+            'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
+        links = []
+        npage = 90  # 智联招聘最多就只显示90页
+        npage = 2  # 测试用
+        for url in urls:
+            for i in range(1, npage + 1):
+                url_tmp = url + '&p=%s' % str(i)
+                print('get content: ' + url_tmp)
+                # 进行URL编码，safe是不编码的字符集
+                # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
+                url_tmp = urllib.parse.quote(url_tmp, safe=string.printable)
+                content = self.get_content(url_tmp)
+                # 分析智联招聘搜索网页知这是在拉取搜索结果的职位链接
+                link_urls = content.select('td.zwmc a')
+                for u in link_urls:
+                    links.append(u.get('href'))
+        links = [url for url in links if ('htm' in url) or ('xiaoyuan' in url and 'first' not in url)]
+        print(links)
+        print(len(links))
+        return (links)  # 前npage页的职位链接都在这里了
 
     def get_link_info(self, url):
         '''
@@ -113,19 +115,15 @@ class worm(object):
         if 'xiaoyuan' in url:
             job = content.select('div.cJobDetailInforWrap h1')[0]  # 工作名称
             company = content.select('div.cJobDetailInforWrap li')[1]  # 公司名称
-            company_url = content.select(
-                'div.cJobDetailInforWrap li a')[0]  # 公司网址
+            company_url = content.select('div.cJobDetailInforWrap li a')[0]  # 公司网址
             date = content.select('div.cJobDetailInforWrap li')[15]  # 发布日期
             num = content.select('div.cJobDetailInforWrap li')[13]  # 人数
             area = content.select('div.cJobDetailInforWrap li')[9]  # 工作地点
             cate = content.select('div.cJobDetailInforWrap li')[11]  # 职位类别
             com_scale = content.select('div.cJobDetailInforWrap li')[5]  # 公司规模
-            com_nature = content.select(
-                'div.cJobDetailInforWrap li')[7]  # 公司性质
-            com_eatcatee = content.select(
-                'div.cJobDetailInforWrap li')[3]  # 公司行业
-            discribe = content.select(
-                'div.cJobDetail_tabSwitch  div.cJobDetail_tabSwitch_content p')[0]  # 加注职位描述
+            com_nature = content.select('div.cJobDetailInforWrap li')[7]  # 公司性质
+            com_eatcatee = content.select('div.cJobDetailInforWrap li')[3]  # 公司行业
+            discribe = content.select('div.cJobDetail_tabSwitch  div.cJobDetail_tabSwitch_content p')[0]  # 加注职位描述
             # 实习生没有这三项
             welfare = None,
             pay = None,
@@ -142,18 +140,13 @@ class worm(object):
             exper = content.select('div.terminalpage-left strong')[4]  # 经验
             num = content.select('div.terminalpage-left strong')[6]  # 人数
             area = content.select('div.terminalpage-left strong')[1]  # 工作地点
-            job_nature = content.select(
-                'div.terminalpage-left strong')[3]  # 工作性质
+            job_nature = content.select('div.terminalpage-left strong')[3]  # 工作性质
             educate = content.select('div.terminalpage-left strong')[5]  # 最低学历
             cate = content.select('div.terminalpage-left strong')[7]  # 职位类别
-            com_scale = content.select(
-                'ul.terminal-ul.clearfix li strong')[8]  # 公司规模
-            com_nature = content.select(
-                'ul.terminal-ul.clearfix li strong')[9]  # 公司性质
-            com_eatcatee = content.select(
-                'ul.terminal-ul.clearfix li strong')[10]  # 公司行业
-            discribe = content.select(
-                'div.terminalpage-main div.tab-inner-cont')[0]  # 职位描述
+            com_scale = content.select('ul.terminal-ul.clearfix li strong')[8]  # 公司规模
+            com_nature = content.select('ul.terminal-ul.clearfix li strong')[9]  # 公司性质
+            com_eatcatee = content.select('ul.terminal-ul.clearfix li strong')[10]  # 公司行业
+            discribe = content.select('div.terminalpage-main div.tab-inner-cont')[0]  # 职位描述
             # 为了保持data赋值一致
             welfare = welfare.text.strip()
             pay = pay.text.strip()
@@ -206,11 +199,10 @@ class worm(object):
                    "公司规模",
                    "公司性质", "公司行业", "职位描述", "是否失效"]
         df = pd.DataFrame(data=[], columns=columns)
-        # links = []
         links = self.get_links_from()
         for url in links:
-            # print('获取职位具体信息, 网址: ' + url)
+            print('获取职位具体信息, 网址: ' + url)
             data = self.get_link_info(url)
             df = df.append(data, ignore_index=True)
-            # print(data)
+            print(data)
         return df
