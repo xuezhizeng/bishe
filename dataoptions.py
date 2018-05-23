@@ -74,6 +74,7 @@ class DataOptions(object):
             这个函数应该是在爬虫爬去所有的数据之后，西安执行format格式化，然后执行这个函数
             执行完这个函数后应该将ddff保存到数据库cty_job中
             后续需要分析的话就直接读取数据库city_job中的数据就行了'''
+        self.log.saveInfo('统计所有的城市/职位信息')
         citys = tuple(set(df.工作地点))
         l = []
         for city in citys:
@@ -114,7 +115,6 @@ class DataOptions(object):
         '''找出各职位的具体招聘信息'''
         # re.I: 正则忽略大小写
         self.log.saveInfo('筛选{}的招聘信息'.format(job))
-        pass
         if 'c++' == job or 'C++' == job:
             job = 'c\+\+'
         elif 'c' == job or 'C' == job:
