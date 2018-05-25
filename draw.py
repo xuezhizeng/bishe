@@ -350,5 +350,5 @@ if __name__ == '__main__':
     d = draw()
     d.compare()
     d.reDraw()
-    d.show()
+    # d.show()
     d.root.mainloop()
