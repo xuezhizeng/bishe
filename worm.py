@@ -83,7 +83,6 @@ class worm(object):
             'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
         links = []
         npage = 90  # 智联招聘最多就只显示90页
-        npage = 2  # 测试用
         for url in urls:
             for i in range(1, npage + 1):
                 url_tmp = url + '&p=%s' % str(i)
