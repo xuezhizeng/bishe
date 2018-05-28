@@ -8,12 +8,14 @@ import string
 from bs4 import BeautifulSoup
 import formatstaing
 import pandas as pd
+import log
 
 
 
 class worm(object):
 
     def __init__(self):
+        self.log = log.log('worm')
         # 用来配置请求包的头，否则有些服务器会拒绝请求
         self.headers = [
             "Mozilla/5.0 (Windows NT 6.1; Win64; rv:27.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
@@ -33,10 +35,6 @@ class worm(object):
             "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11"
         ]
 
-        # self.urls = 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0'
-
-        # self.urls = ['http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
-        # 'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=160400;160500;300100;160600&jl=选择地区&isadv=0']
 
     def get_content(self, url):
         '''
@@ -44,6 +42,7 @@ class worm(object):
         :param url: 需要获取内容的网页链接
         :return: 经lxml解析后的网页内容
         '''
+        self.log.saveInfo('获取网页内容:' + url)
         random_header = random.choice(self.headers)
         req = urllib.request.Request(url)
         # random_header="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0"
@@ -53,7 +52,7 @@ class worm(object):
         try:
             html = urllib.request.urlopen(req)  # 打开请求网页
         except (urllib.error.HTTPError, TimeoutError) as e:
-            print(e)
+            pass#print(e)
         else:
             contents = html.read()  # html.read()只能执行一次，再次执行返回结果为空，所以得先把结果保存下来
             if isinstance(contents, bytes):  # 判断输出内容contents是否是字节格式
@@ -62,7 +61,6 @@ class worm(object):
             return (contents)
 
     def get_links_from(self):
-        # def get_links_from(job, npage=1, city='全国'):
         '''
         搜索页面,返回搜索结果前npage页的职位超链接
         :param job: 工作名称
@@ -70,13 +68,7 @@ class worm(object):
         :param npage: 需要多少页的搜索结果
         :return: 所有列表的超链接，即子页网址
         '''
-        # city_tmp = "jl={}".format('全国')
-        # if isinstance(city, str) and city:
-        #     city_tmp += "%2B{}".format(city)
-        # else:
-        #     for i in range(len(city)):
-        #         city_tmp += "%2B{}".format(str(city[i]))
-
+        self.log.saveInfo('获取所有的职位页面链接')
         # 这里这个urls是囊括了IT行业几乎所有的搜索页面
         urls = [
             'http://sou.zhaopin.com/jobs/searchresult.ashx?bj=160000&in=210500;160000;160200;160100&jl=选择地区&isadv=0',
@@ -86,7 +78,7 @@ class worm(object):
         for url in urls:
             for i in range(1, npage + 1):
                 url_tmp = url + '&p=%s' % str(i)
-                print('get content: ' + url_tmp)
+                # print('get content: ' + url_tmp)
                 # 进行URL编码，safe是不编码的字符集
                 # quote('枝桠') -> '%E6%9E%9D%E6%A1%A0'
                 url_tmp = urllib.parse.quote(url_tmp, safe=string.printable)
@@ -96,8 +88,6 @@ class worm(object):
                 for u in link_urls:
                     links.append(u.get('href'))
         links = [url for url in links if ('htm' in url) or ('xiaoyuan' in url and 'first' not in url)]
-        print(links)
-        print(len(links))
         return (links)  # 前npage页的职位链接都在这里了
 
     def get_link_info(self, url):
@@ -108,7 +98,7 @@ class worm(object):
         '''
 
         # 获取网页内容
-        # print("获取网页: " + str(url) + " 有用信息")
+        self.log.saveInfo('获取求职页面有用信息')
         content = self.get_content(url)
         # 校园招聘的HTML格式与其他不同，所以这里要分开选择
         if 'xiaoyuan' in url:
@@ -194,14 +184,13 @@ class worm(object):
         调用get_link_info()函数爬取所有数据，保存到数据库
         :return: 不返回，值保存到数据库，需要自己到数据库取
         '''
+        self.log.saveInfo('爬取数据')
         columns = ["网址", "工作名称", "公司名称", "公司网址", "福利", "月工资", "发布日期", "经验", "人数", "工作地点", "工作性质", "最低学历", "职位类别",
                    "公司规模",
                    "公司性质", "公司行业", "职位描述", "是否失效"]
         df = pd.DataFrame(data=[], columns=columns)
         links = self.get_links_from()
         for url in links:
-            print('获取职位具体信息, 网址: ' + url)
             data = self.get_link_info(url)
             df = df.append(data, ignore_index=True)
-            print(data)
         return df

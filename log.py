@@ -23,7 +23,7 @@ class log(object):
 
         # 定义handler的输出格式
         formatter = logging.Formatter(
-            '[%(asctime)s][%(name)s][%(thread)d][%(levelname)s]%(message)s')
+            '[%(asctime)s][%(thread)d][%(levelname)s][%(name)s.py]%(message)s')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
